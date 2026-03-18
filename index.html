@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIS Bridge — HealthV MedTech MVP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#F0F4F8;color:#1E293B;min-height:100vh}
+:root{
+  --navy:#0B2D5E;--navyM:#1A4A8A;--navyL:#EEF2FB;
+  --teal:#006D6B;--tealM:#00A896;--tealL:#E3F4F3;
+  --green:#065F46;--greenM:#059669;--greenL:#D1FAE5;
+  --gold:#92400E;--goldM:#D97706;--goldL:#FEF3C7;
+  --red:#B91C1C;--redM:#DC2626;--redL:#FEE2E2;
+  --blue:#1E40AF;--blueM:#3B82F6;--blueL:#EFF6FF;
+  --purp:#5B21B6;--purpM:#7C3AED;--purpL:#F5F3FF;
+  --coral:#EA580C;
+  --g1:#1E293B;--g3:#475569;--g5:#94A3B8;--g8:#E2E8F0;
+  --white:#FFFFFF;--bg:#F8FAFC;
+}
+.header{background:var(--navy);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.header-inner{max-width:1280px;margin:0 auto;height:54px;display:flex;align-items:center;justify-content:space-between}
+.logo-icon{width:34px;height:34px;background:var(--tealM);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;font-size:16px;flex-shrink:0}
+.logo-name{font-weight:800;font-size:17px;color:white}
+.logo-sub{font-size:9px;color:var(--tealM);letter-spacing:2px;font-weight:700}
+.live-badge{display:flex;align-items:center;gap:5px;padding:3px 11px;background:rgba(0,168,150,.15);border:1px solid rgba(0,168,150,.4);border-radius:20px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--tealM);animation:pulse 1.4s infinite}
+#app{max-width:1280px;margin:0 auto;padding:20px 24px 48px}
+/* TABS */
+.tabs{display:flex;gap:2px;background:white;border-radius:12px;padding:4px;margin-bottom:22px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.tab{flex:1;padding:9px 4px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--g5);font-family:inherit;transition:all .15s;white-space:nowrap}
+.tab:hover{background:var(--navyL);color:var(--navy)}
+.tab.active{background:var(--navy);color:white;font-weight:700}
+/* CARDS */
+.card{background:white;border-radius:12px;padding:20px;border:1px solid var(--g8);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px}
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bg);border-radius:10px;padding:14px 16px;border:1px solid var(--g8);text-align:center}
+.stat-label{font-size:10px;color:var(--g5);font-weight:600;letter-spacing:.5px;margin-bottom:4px}
+.stat-val{font-size:24px;font-weight:800;font-family:monospace}
+.stat-sub{font-size:10px;color:var(--g5);margin-top:2px}
+/* PROGRESS */
+.progress{height:7px;background:var(--g8);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .6s ease}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+/* BUTTONS */
+.btn-primary{padding:9px 20px;background:var(--tealM);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary:hover{background:#008a7a}
+.btn-sm{padding:5px 12px;border:1.5px solid var(--g8);border-radius:6px;background:white;font-size:11px;font-weight:600;cursor:pointer;color:var(--g3);font-family:inherit;transition:all .15s}
+.btn-sm:hover{background:var(--tealL);border-color:var(--tealM);color:var(--teal)}
+/* HIS ROW */
+.his-row{display:grid;grid-template-columns:22px 1fr 130px 120px 90px 120px 20px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #F1F5F9;cursor:pointer;transition:background .1s}
+.his-row:last-child{border-bottom:none}
+.his-row:hover{background:#FAFBFD}
+/* STATUS DOT */
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* MODAL */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:white;border-radius:16px;padding:28px;width:520px;max-width:92vw;box-shadow:0 24px 64px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
+/* STEP indicator */
+.step-wrap{display:flex;margin-bottom:22px}
+.step-item{flex:1;text-align:center}
+.step-circle{width:28px;height:28px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all .3s}
+/* FORM */
+input[type=text],input[type=password],select,textarea{width:100%;padding:9px 12px;border:1.5px solid var(--g8);border-radius:8px;font-size:13px;font-family:inherit;color:var(--g1);background:white;outline:none;transition:border .15s}
+input:focus,select:focus{border-color:var(--tealM)}
+label{font-size:11px;font-weight:600;color:var(--g5);display:block;margin-bottom:5px;letter-spacing:.4px}
+/* PRE */
+pre{font-size:10px;background:#0B2D5E;color:#A8EDEA;padding:14px;border-radius:8px;overflow:auto;max-height:260px;font-family:monospace;line-height:1.6}
+/* ARCH DIAGRAM */
+.arch-node{padding:8px 12px;border-radius:8px;border:1.5px solid;font-size:10px;font-weight:600;text-align:center;white-space:nowrap}
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fadein{animation:fadein .25s ease}
+.spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.g5c{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+/* PANE */
+.pane{display:none}.pane.active{display:block}
+/* Expandable row detail */
+.row-detail{background:#F8FAFC;border:1.5px solid var(--tealM);border-top:none;border-radius:0 0 10px 10px;padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;animation:fadein .2s ease}
+/* Patient card */
+.pt-card{cursor:pointer;transition:all .15s}
+.pt-card:hover .pt-header{background:var(--navyL)}
+.pt-header{background:var(--bg);border-radius:10px;padding:12px 16px;border:1.5px solid var(--g8);transition:all .15s}
+.pt-header.selected{border-color:var(--tealM);background:var(--tealL)}
+.pt-detail{border:1.5px solid var(--tealM);border-top:none;border-radius:0 0 10px 10px;padding:14px;background:#FAFFFE;animation:fadein .2s ease}
+/* DQ */
+.dq-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+/* Pricing */
+.price-card{border-radius:14px;padding:22px;position:relative;transition:transform .15s}
+.price-card:hover{transform:translateY(-2px)}
+/* Arch flow */
+.arch-flow{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px}
+.arch-col{display:flex;flex-direction:column;gap:6px;min-width:130px;justify-content:center}
+.arch-arrow{display:flex;align-items:center;padding:0 10px;font-size:22px;color:var(--g8);flex-shrink:0}
+.arch-box{padding:20px 16px;border-radius:12px;flex-shrink:0;min-width:160px}
+/* Responsive */
+@media(max-width:768px){.g2,.g3,.g4,.g5c{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="logo-icon">H</div>
+      <div>
+        <div class="logo-name">HIS Bridge</div>
+        <div class="logo-sub">SYSTEM INTERCONNECTION · Copyright @2026 by Hoang Thuong</div>
+      </div>
+      <div class="live-badge" style="margin-left:12px">
+        <div class="live-dot"></div>
+        <span style="font-size:10px;color:var(--tealM);font-weight:700">MVP v0.1</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:4px" id="tab-bar"></div>
+    <div style="font-size:11px;color:#8AAEC8">Demo · Q1/2026</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="tabs" id="tabs-row"></div>
+  <div id="pane-dashboard" class="pane active"></div>
+  <div id="pane-his" class="pane"></div>
+  <div id="pane-mpi" class="pane"></div>
+  <div id="pane-dq" class="pane"></div>
+  <div id="pane-api" class="pane"></div>
+  <div id="pane-pricing" class="pane"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="connect-modal" style="display:none">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--navy)">Kết nối HIS mới</div>
+        <div style="font-size:11px;color:var(--g5)">Không yêu cầu thay đổi HIS hiện tại</div>
+      </div>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:22px;color:var(--g5);cursor:pointer">×</button>
+    </div>
+    <div class="step-wrap" id="step-wrap"></div>
+    <div id="step-content"></div>
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end" id="step-btns"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════
+const HIS_DATA = [
+  {id:"h1",name:"BV Vinmec Times City",vendor:"Medisoft 5.2",type:"SQL",status:"connected",patients:12400,dq:82,fhir:false,sync:"2 phút trước",loc:"Hà Nội",tier:1},
+  {id:"h2",name:"BV Đa khoa FV",vendor:"Oracle Health Cerner",type:"FHIR",status:"connected",patients:8900,dq:96,fhir:true,sync:"30 giây trước",loc:"TPHCM",tier:1},
+  {id:"h3",name:"BV Thu Cúc",vendor:"iSofH v3.1",type:"HL7v2",status:"connected",patients:6700,dq:74,fhir:false,sync:"8 phút trước",loc:"Hà Nội",tier:2},
+  {id:"h4",name:"BV Huyện Đan Phượng",vendor:"Phần mềm tự viết",type:"CSV",status:"partial",patients:2100,dq:41,fhir:false,sync:"1 ngày trước",loc:"Hà Nội",tier:3},
+  {id:"h5",name:"Phòng khám Medlatec",vendor:"CMC HIS 2.0",type:"REST",status:"pending",patients:0,dq:0,fhir:false,sync:"Chưa kết nối",loc:"Hà Nội",tier:2},
+  {id:"h6",name:"BV Bạch Mai (pilot)",vendor:"VNPT-IT HIS",type:"HL7v2",status:"connected",patients:31000,dq:68,fhir:false,sync:"15 phút trước",loc:"Hà Nội",tier:1},
+];
+
+const PATIENTS = [
+  {id:"PT-001",name:"Nguyễn Văn An",dob:"1965-03-15",cccd:"001065012345",sex:"Nam",src:["h1","h6"],cond:["ĐTĐ type II (E11)","THA (I10)"],meds:["Metformin 500mg × 2/ngày","Amlodipine 5mg × 1/ngày"],allergy:false,visit:"22/01/2024"},
+  {id:"PT-002",name:"Trần Thị Bình",dob:"1978-07-22",cccd:"038078034567",sex:"Nữ",src:["h2","h3"],cond:["Viêm gan B mạn (B18.1)"],meds:["Tenofovir 300mg × 1/ngày"],allergy:true,visit:"18/01/2024"},
+  {id:"PT-003",name:"Phạm Thị Dung",dob:"1955-04-30",cccd:"027055078901",sex:"Nữ",src:["h1","h3","h6"],cond:["COPD (J44.1)","THA (I10)","Suy tim (I50.0)"],meds:["Tiotropium inhaler","Bisoprolol 5mg","Furosemide 40mg"],allergy:true,visit:"20/01/2024"},
+  {id:"PT-004",name:"Lê Minh Châu",dob:"1990-11-08",cccd:"079090056789",sex:"Nam",src:["h2"],cond:["Hen phế quản (J45.0)"],meds:["Salbutamol 100mcg inhaler","Budesonide 200mcg"],allergy:false,visit:"19/01/2024"},
+];
+
+const ADAPTER = {
+  SQL:   {label:"SQL Connector",  col:"#7C3AED",desc:"Read-only DB"},
+  FHIR:  {label:"FHIR Native",    col:"#0EA5E9",desc:"FHIR R4 passthrough"},
+  HL7v2: {label:"HL7 v2 Listener",col:"#059669",desc:"MLLP port"},
+  REST:  {label:"REST Adapter",   col:"#D97706",desc:"Custom API"},
+  CSV:   {label:"File Watcher",   col:"#DC2626",desc:"CSV/Excel"},
+};
+
+const DQ_CRITERIA = [
+  {label:"ICD-10-VN có mã hợp lệ",w:25},
+  {label:"Ngày sinh + CCCD đầy đủ",w:20},
+  {label:"Mã thuốc có ATC code",w:20},
+  {label:"Encounter có timestamp",w:15},
+  {label:"Kết quả XN có LOINC",w:10},
+  {label:"Bác sĩ có mã hành nghề",w:10},
+];
+
+const FHIR_SAMPLES = {
+  Patient:{resourceType:"Patient",id:"PT-001",meta:{lastUpdated:"2024-01-22T10:30:00+07:00",source:"HIS Bridge v0.1",tag:[{code:"his_001",display:"Vinmec Times City"}]},identifier:[{system:"https://healthv.vn/mpi",value:"PT-001"},{system:"https://id.gov.vn/cccd",value:"001065012345"}],name:[{use:"official",family:"Nguyễn",given:["Văn An"]}],birthDate:"1965-03-15",gender:"male",address:[{country:"VN",state:"Hà Nội"}]},
+  Condition:{resourceType:"Bundle",type:"searchset",total:2,entry:[{resource:{resourceType:"Condition",id:"C001",subject:{reference:"Patient/PT-001"},code:{coding:[{system:"http://hl7.org/fhir/sid/icd-10",code:"E11",display:"Đái tháo đường type II"}]},recordedDate:"2022-05-10",clinicalStatus:{coding:[{code:"active"}]}}},{resource:{resourceType:"Condition",id:"C002",subject:{reference:"Patient/PT-001"},code:{coding:[{system:"http://hl7.org/fhir/sid/icd-10",code:"I10",display:"Tăng huyết áp nguyên phát"}]},recordedDate:"2021-03-15",clinicalStatus:{coding:[{code:"active"}]}}}]},
+  MedicationRequest:{resourceType:"Bundle",type:"searchset",total:2,entry:[{resource:{resourceType:"MedicationRequest",id:"M001",status:"active",subject:{reference:"Patient/PT-001"},medicationCodeableConcept:{coding:[{system:"http://www.whocc.no/atc",code:"A10BA02",display:"Metformin"}]},dosageInstruction:[{text:"500mg × 2 lần/ngày sau ăn"}]}},{resource:{resourceType:"MedicationRequest",id:"M002",status:"active",subject:{reference:"Patient/PT-001"},medicationCodeableConcept:{coding:[{system:"http://www.whocc.no/atc",code:"C08CA01",display:"Amlodipine"}]},dosageInstruction:[{text:"5mg × 1 lần/ngày"}]}}]},
+};
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let STATE = {tab:"dashboard",selectedHIS:null,selectedPT:null,connectStep:0,apiLoading:false,apiResult:null,connectData:{name:"",vendor:"medisoft",type:"SQL"}};
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function dqColor(s){return s>=80?"#059669":s>=60?"#D97706":s>=40?"#EA580C":"#DC2626"}
+function statusColor(s){return s==="connected"?"#059669":s==="partial"?"#D97706":"#94A3B8"}
+function ratingLabel(s){return s>=80?"✅ Sẵn sàng cho AI":s>=60?"⚠ Cần cải thiện":s>=40?"🔴 Chưa đạt":s>0?"⛔ Cần xem xét":"—"}
+function badge(label,col){return `<span class="badge" style="color:${col};background:${col}18;border:1px solid ${col}40">${label}</span>`}
+function progressBar(val,col,h=7){return `<div class="progress" style="height:${h}px"><div class="progress-fill" style="width:${Math.max(0,Math.min(100,val))}%;background:${col};height:${h}px"></div></div>`}
+function getHIS(id){return HIS_DATA.find(h=>h.id===id)}
+
+// ══════════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════════
+const TABS=[
+  {id:"dashboard",label:"📊 Dashboard"},
+  {id:"his",label:"🏥 HIS Connections"},
+  {id:"mpi",label:"👤 Patient MPI"},
+  {id:"dq",label:"✅ Data Quality"},
+  {id:"api",label:"⚡ API Gateway"},
+  {id:"pricing",label:"💰 Pricing"},
+];
+
+function initTabs(){
+  const row=document.getElementById('tabs-row');
+  row.innerHTML=TABS.map(t=>`<button class="tab${STATE.tab===t.id?' active':''}" onclick="switchTab('${t.id}')">${t.label}</button>`).join('');
+}
+function switchTab(id){
+  STATE.tab=id;
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.toggle('active',t.textContent.includes(TABS.find(x=>x.id===id).label.split(' ').slice(1).join(' ')))});
+  initTabs();
+  renderPane(id);
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER PANES
+// ══════════════════════════════════════════════════════════
+function renderPane(id){
+  const el=document.getElementById('pane-'+id);
+  switch(id){
+    case 'dashboard': el.innerHTML=renderDashboard(); break;
+    case 'his':       el.innerHTML=renderHIS(); attachHISEvents(); break;
+    case 'mpi':       el.innerHTML=renderMPI(); attachMPIEvents(); break;
+    case 'dq':        el.innerHTML=renderDQ(); break;
+    case 'api':       el.innerHTML=renderAPI(); break;
+    case 'pricing':   el.innerHTML=renderPricing(); break;
+  }
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────
+function renderDashboard(){
+  const connected=HIS_DATA.filter(h=>h.status==="connected");
+  const totalPts=connected.reduce((s,h)=>s+h.patients,0);
+  const avgDQ=Math.round(connected.reduce((s,h)=>s+h.dq,0)/connected.length);
+  return `
+  <div class="fadein">
+  <div style="margin-bottom:18px">
+    <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:4px">HIS Bridge — Control Center</h2>
+    <p style="font-size:12px;color:var(--g5)">Tổng quan liên thông hệ thống HIS · Demo data · HealthV MedTech Q1/2026</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">HIS ĐÃ KẾT NỐI</div><div class="stat-val" style="color:var(--greenM)">${connected.length}</div><div class="stat-sub">/ ${HIS_DATA.length} tổng</div></div>
+    <div class="stat-card"><div class="stat-label">PATIENT RECORDS</div><div class="stat-val" style="color:var(--navy)">${totalPts.toLocaleString()}</div><div class="stat-sub">đã FHIR hóa</div></div>
+    <div class="stat-card"><div class="stat-label">AVG DQ SCORE</div><div class="stat-val" style="color:var(--goldM)">${avgDQ}%</div><div class="stat-sub">Data Quality</div></div>
+    <div class="stat-card"><div class="stat-label">FHIR API CALLS</div><div class="stat-val" style="color:var(--purpM)">12,847</div><div class="stat-sub">hôm nay (demo)</div></div>
+    <div class="stat-card"><div class="stat-label">TIẾT KIỆM</div><div class="stat-val" style="color:var(--coral)">~4 th</div><div class="stat-sub">integration/AI project</div></div>
+  </div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <!-- HIS list -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:0">HIS Connections</div>
+        <button class="btn-primary" style="padding:6px 14px;font-size:11px" onclick="openModal()">+ Kết nối HIS mới</button>
+      </div>
+      ${HIS_DATA.slice(0,4).map(h=>{
+        const at=ADAPTER[h.type];
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F1F5F9;cursor:pointer" onclick="switchTab('his')">
+          <div class="status-dot" style="background:${statusColor(h.status)}"></div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600">${h.name}</div>
+            <div style="font-size:10px;color:var(--g5)">${h.vendor} · ${h.loc}</div>
+          </div>
+          ${badge(at.label,at.col)}
+          <div style="min-width:90px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--g5);margin-bottom:2px"><span>DQ</span><span style="color:${dqColor(h.dq)};font-weight:700">${h.dq}%</span></div>
+            ${progressBar(h.dq,dqColor(h.dq),6)}
+          </div>
+          <div style="font-size:10px;color:var(--g5);min-width:60px;text-align:right">${h.patients>0?h.patients.toLocaleString()+" pts":"—"}</div>
+        </div>`;
+      }).join('')}
+      <div style="text-align:center;margin-top:10px"><button onclick="switchTab('his')" style="font-size:11px;color:var(--tealM);background:none;border:none;font-weight:600;cursor:pointer">Xem tất cả →</button></div>
+    </div>
+
+    <!-- Value + AI products -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="flex:1">
+        <div class="card-title">Giá trị cầu nối</div>
+        ${[
+          ["⏱","Integration time","2–6 tháng","2–4 tuần"],
+          ["💾","Data standard","Nhiều format độc quyền","FHIR R4 thống nhất"],
+          ["🔒","Patient control","Không có","Consent-based"],
+          ["🤖","AI readiness","Từng BV riêng lẻ","Multi-HIS ngay lập tức"],
+        ].map(([ic,lb,bef,aft])=>`
+          <div style="margin-bottom:8px">
+            <div style="font-size:10px;color:var(--g5);margin-bottom:3px">${ic} ${lb}</div>
+            <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+              <span style="font-size:10px;color:var(--redM);background:var(--redL);padding:1px 7px;border-radius:4px;text-decoration:line-through">${bef}</span>
+              <span style="font-size:11px;color:var(--g5)">→</span>
+              <span style="font-size:10px;color:var(--greenM);background:var(--greenL);padding:1px 7px;border-radius:4px;font-weight:700">${aft}</span>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="card" style="background:var(--navyL);border-color:var(--navyM)">
+        <div class="card-title" style="color:var(--navy)">🎯 AI Products được mở khóa</div>
+        ${["🔍 EvalAIH — Kiểm chứng AI","🎙️ Ambient Scribe VN","🩺 Telemedicine Agent","📡 AI.DFS Dự báo dịch bệnh"].map(p=>`<div style="font-size:11px;color:var(--navyM);margin-bottom:5px;font-weight:500">✓ ${p}</div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Architecture flow -->
+  <div class="card">
+    <div class="card-title">Kiến trúc HIS Bridge — Luồng dữ liệu</div>
+    <div class="arch-flow">
+      <div class="arch-col">
+        ${["Medisoft (SQL)","Oracle Cerner (FHIR)","iSofH (HL7v2)","Phần mềm tự viết (CSV)"].map((s,i)=>`<div class="arch-node" style="background:${["#7C3AED","#0EA5E9","#059669","#DC2626"][i]}18;border-color:${["#7C3AED","#0EA5E9","#059669","#DC2626"][i]}60;color:${["#7C3AED","#0EA5E9","#059669","#DC2626"][i]}">${s}</div>`).join('')}
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="background:var(--purpL);border:2px solid var(--purpM)">
+        <div style="font-size:11px;font-weight:700;color:var(--purpM);margin-bottom:6px;text-align:center">🔌 Adapters</div>
+        ${["SQL Connector","HL7v2 Listener","FHIR Native","REST Adapter","CSV Parser"].map(a=>`<div style="font-size:9px;color:var(--purpM);margin-bottom:2px">• ${a}</div>`).join('')}
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="background:var(--navyL);border:2px solid var(--navy)">
+        <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px;text-align:center">⚙️ Bridge Core</div>
+        ${["MPI — Định danh BN","FHIR R4 Normalizer","Terminology Mapper","Consent Engine","DQ Validator","Audit Trail (WORM)"].map(c=>`<div style="font-size:9px;color:var(--g3);margin-bottom:2px">• ${c}</div>`).join('')}
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="background:var(--tealL);border:2px solid var(--tealM)">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px;text-align:center">⚡ API Gateway</div>
+        ${["FHIR R4 REST","OAuth2 SMART","Rate Limiting","Audit Log"].map(a=>`<div style="font-size:9px;color:var(--teal);margin-bottom:2px">• ${a}</div>`).join('')}
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-col">
+        ${["🔍 EvalAIH","🎙️ Ambient Scribe","🩺 Telemedicine","📡 AI.DFS","👤 Patient Portal"].map(s=>`<div class="arch-node" style="background:var(--greenL);border-color:#05986960;color:var(--green)">${s}</div>`).join('')}
+      </div>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ─── HIS CONNECTIONS ──────────────────────────────────────
+function renderHIS(){
+  return `<div class="fadein">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+    <div>
+      <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:2px">HIS Connections</h2>
+      <p style="font-size:12px;color:var(--g5)">${HIS_DATA.filter(h=>h.status==="connected").length} đã kết nối · ${HIS_DATA.filter(h=>h.status==="pending").length} đang chờ · Không yêu cầu thay đổi HIS</p>
+    </div>
+    <button class="btn-primary" onclick="openModal()">+ Kết nối HIS mới</button>
+  </div>
+  <div id="his-list">
+    ${HIS_DATA.map(h=>{
+      const at=ADAPTER[h.type];
+      const sc=statusColor(h.status);
+      return `
+      <div style="margin-bottom:10px">
+        <div class="card" style="cursor:pointer;transition:border .15s;border-color:${STATE.selectedHIS===h.id?'var(--tealM)':'var(--g8)'}" id="his-card-${h.id}" onclick="toggleHIS('${h.id}')">
+          <div class="his-row">
+            <div class="status-dot" style="background:${sc}"></div>
+            <div>
+              <div style="font-size:13px;font-weight:700">${h.name}</div>
+              <div style="font-size:10px;color:var(--g5)">${h.vendor} · ${h.loc} · Tuyến ${h.tier}</div>
+            </div>
+            ${badge(at.label,at.col)}
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--g5);margin-bottom:3px"><span>DQ Score</span><span style="color:${dqColor(h.dq)};font-weight:700">${h.dq}%</span></div>
+              ${progressBar(h.dq,dqColor(h.dq),7)}
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;font-weight:700;color:var(--navy)">${h.patients>0?h.patients.toLocaleString():"—"}</div>
+              <div style="font-size:10px;color:var(--g5)">patients</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:10px;color:var(--g5)">Sync</div>
+              <div style="font-size:10px;color:var(--g3);font-weight:500">${h.sync}</div>
+            </div>
+            <div style="font-size:12px;color:var(--tealM)" id="arrow-${h.id}">${STATE.selectedHIS===h.id?'▲':'▼'}</div>
+          </div>
+        </div>
+        <div class="row-detail" id="detail-${h.id}" style="display:${STATE.selectedHIS===h.id?'grid':'none'}">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">Adapter Config</div>
+            ${[["Type",at.label],["Protocol",h.type],["Status",h.status],["FHIR Native",h.fhir?"✓ Có":"✗ Không"]].map(([k,v])=>`
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+                <span style="color:var(--g5)">${k}</span>
+                <span style="color:var(--g1);font-weight:500">${v}</span>
+              </div>`).join('')}
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">Data Quality Detail</div>
+            ${DQ_CRITERIA.map(r=>{
+              const pass=h.dq>70?Math.random()>0.2:h.dq>50?Math.random()>0.4:Math.random()>0.6;
+              return `<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">
+                <span style="color:var(--g3)">${r.label}</span>
+                <span style="color:${pass?'var(--greenM)':'var(--redM)'};font-weight:700">${pass?'✓':'✗'}</span>
+              </div>`;
+            }).join('')}
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">Actions</div>
+            ${[["🔄 Trigger manual sync","var(--tealM)"],["📊 View DQ report","var(--navyM)"],["⚡ Test FHIR API","var(--purpM)"],["📋 Export sample","var(--goldM)"]].map(([l,c])=>`
+              <button onclick="alert('Demo: ${l}')" style="display:block;width:100%;padding:7px 12px;background:${c}18;border:1px solid ${c}40;border-radius:7px;font-size:11px;color:${c};font-weight:600;margin-bottom:6px;cursor:pointer;font-family:inherit;text-align:left">${l}</button>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  </div>`;
+}
+function attachHISEvents(){}
+function toggleHIS(id){
+  STATE.selectedHIS=STATE.selectedHIS===id?null:id;
+  renderPane('his');
+}
+
+// ─── PATIENT MPI ──────────────────────────────────────────
+function renderMPI(){
+  const cross=PATIENTS.filter(p=>p.src.length>1).length;
+  return `<div class="fadein">
+  <div style="margin-bottom:18px">
+    <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:2px">Master Patient Index (MPI)</h2>
+    <p style="font-size:12px;color:var(--g5)">Định danh bệnh nhân duy nhất · Tổng hợp từ nhiều HIS · Lấy người bệnh làm trung tâm</p>
+  </div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">TOTAL PATIENTS (MPI)</div><div class="stat-val" style="color:var(--navy)">61,100</div><div class="stat-sub">Unique records đã merge</div></div>
+    <div class="stat-card"><div class="stat-label">CROSS-HIS MATCHES</div><div class="stat-val" style="color:var(--greenM)">4,280</div><div class="stat-sub">BN có hồ sơ ≥2 BV</div></div>
+  </div>
+  <div class="g2">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:12px">Danh sách bệnh nhân (demo)</div>
+      ${PATIENTS.map(pt=>`
+        <div class="pt-card" style="margin-bottom:8px">
+          <div class="pt-header${STATE.selectedPT===pt.id?' selected':''}" id="pt-${pt.id}" onclick="togglePT('${pt.id}')">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--navyL);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${pt.sex==="Nam"?"👨":"👩"}</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:700">${pt.name}</div>
+                <div style="font-size:10px;color:var(--g5)">CCCD: ${pt.cccd} · ${pt.dob} · ${pt.sex}</div>
+                <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap">
+                  ${pt.src.map(s=>{const h=getHIS(s);return h?badge(h.name.split(' ').slice(-2).join(' '),'#1A4A8A'):''}).join(' ')}
+                  ${pt.allergy?badge('⚠ Allergy','#DC2626'):''}
+                  ${pt.src.length>1?badge('Multi-HIS','#059669'):''}
+                </div>
+              </div>
+              <div style="font-size:11px;color:var(--tealM)">${STATE.selectedPT===pt.id?'▲':'▼'}</div>
+            </div>
+          </div>
+          ${STATE.selectedPT===pt.id?`
+          <div class="pt-detail">
+            <div class="g2" style="margin-bottom:10px">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">Chẩn đoán (ICD-10-VN)</div>
+                ${pt.cond.map(c=>`<div style="font-size:10px;color:var(--greenM);margin-bottom:3px;font-weight:500">• ${c}</div>`).join('')}
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">Thuốc (ATC)</div>
+                ${pt.meds.map(m=>`<div style="font-size:10px;color:var(--g3);margin-bottom:3px">• ${m}</div>`).join('')}
+              </div>
+            </div>
+            <div style="display:flex;gap:7px;margin-top:6px">
+              <button onclick="loadFHIR('Patient')" style="flex:1;padding:7px 0;background:var(--purpL);border:1px solid var(--purpM)40;border-radius:7px;font-size:11px;color:var(--purpM);font-weight:600;cursor:pointer">⚡ FHIR Patient</button>
+              <button onclick="loadFHIR('Condition')" style="flex:1;padding:7px 0;background:var(--blueL);border:1px solid var(--blueM)40;border-radius:7px;font-size:11px;color:var(--blueM);font-weight:600;cursor:pointer">⚡ FHIR Condition</button>
+              <button onclick="loadFHIR('MedicationRequest')" style="flex:1;padding:7px 0;background:var(--goldL);border:1px solid var(--goldM)40;border-radius:7px;font-size:11px;color:var(--goldM);font-weight:600;cursor:pointer">⚡ FHIR Medication</button>
+            </div>
+          </div>`:''}
+        </div>`).join('')}
+    </div>
+    <div class="card" id="fhir-preview-card">
+      <div class="card-title">FHIR R4 Resource — Live Preview</div>
+      <div id="fhir-output" style="text-align:center;padding:40px 0;color:var(--g5)">
+        <div style="font-size:32px;margin-bottom:10px">📋</div>
+        <p style="font-size:12px">Chọn bệnh nhân → nhấn FHIR button để xem resource chuẩn</p>
+      </div>
+    </div>
+  </div>
+  </div>`;
+}
+function attachMPIEvents(){}
+function togglePT(id){STATE.selectedPT=STATE.selectedPT===id?null:id;renderPane('mpi');}
+function loadFHIR(resource){
+  const el=document.getElementById('fhir-output');
+  if(!el)return;
+  el.innerHTML=`<div style="text-align:center;padding:30px 0"><div style="width:28px;height:28px;border:3px solid var(--g8);border-top-color:var(--tealM);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div><p style="font-size:11px;color:var(--g5)">Querying FHIR R4...</p></div>`;
+  setTimeout(()=>{
+    const data=FHIR_SAMPLES[resource]||{resourceType:resource};
+    el.innerHTML=`
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+        ${badge("200 OK","#059669")} ${badge("GET /fhir/r4/"+resource,"#0B2D5E")} ${badge("FHIR R4","#7C3AED")}
+      </div>
+      <pre>${JSON.stringify(data,null,2)}</pre>`;
+  },1000);
+}
+
+// ─── DATA QUALITY ─────────────────────────────────────────
+function renderDQ(){
+  const sorted=[...HIS_DATA].filter(h=>h.dq>0).sort((a,b)=>b.dq-a.dq);
+  return `<div class="fadein">
+  <div style="margin-bottom:18px">
+    <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:2px">Data Quality Dashboard</h2>
+    <p style="font-size:12px;color:var(--g5)">Đánh giá chất lượng dữ liệu từng HIS · 6 tiêu chí · Chuẩn WHO · HL7 FHIR</p>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">DQ Score theo HIS</div>
+      ${sorted.map(h=>{
+        const c=dqColor(h.dq);
+        const at=ADAPTER[h.type];
+        return `<div class="dq-row">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <span style="font-size:12px;font-weight:600">${h.name}</span>
+              ${badge(at.label,at.col)}
+            </div>
+            ${progressBar(h.dq,c,10)}
+            <div style="font-size:10px;color:var(--g5);margin-top:2px">${ratingLabel(h.dq)}</div>
+          </div>
+          <div style="font-size:20px;font-weight:800;color:${c};font-family:monospace;min-width:44px;text-align:right">${h.dq}%</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">6 Tiêu chí DQ — Trọng số</div>
+        ${DQ_CRITERIA.map(r=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+            <span style="font-size:11px;color:var(--g3)">${r.label}</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              ${progressBar(r.w*4,r.w>=20?'var(--tealM)':'var(--blueM)')}... 
+              <span style="font-size:10px;font-weight:700;color:var(--g5);min-width:24px">${r.w}%</span>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="card" style="background:var(--navyL);border-color:var(--navyM)">
+        <div class="card-title" style="color:var(--navy)">💡 Action Plan tự động</div>
+        ${[
+          {his:"BV Huyện Đan Phượng",action:"Upload CSV + AI Mapper chuẩn hóa ICD-10",pri:"HIGH",col:"var(--redM)"},
+          {his:"BV Bạch Mai",action:"Bổ sung LOINC code cho xét nghiệm thường quy",pri:"MED",col:"var(--goldM)"},
+          {his:"BV Thu Cúc",action:"Cập nhật mapping ATC cho danh mục thuốc",pri:"MED",col:"var(--goldM)"},
+        ].map(a=>`
+          <div style="margin-bottom:8px;padding:9px 11px;background:white;border-radius:8px;border:1px solid ${a.col}30">
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+              <span style="font-size:11px;font-weight:700">${a.his}</span>
+              ${badge(a.pri,a.col)}
+            </div>
+            <div style="font-size:10px;color:var(--g3)">${a.action}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ─── API GATEWAY ──────────────────────────────────────────
+function renderAPI(){
+  return `<div class="fadein">
+  <div style="margin-bottom:18px">
+    <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:2px">FHIR R4 API Gateway</h2>
+    <p style="font-size:12px;color:var(--g5)">Một API duy nhất · Mọi HIS · SMART on FHIR OAuth2 · Rate limiting · Audit log</p>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Live API Demo</div>
+        <div style="font-size:11px;color:var(--g5);margin-bottom:12px">Base URL: <code style="background:var(--bg);padding:2px 7px;border-radius:4px;font-family:monospace;font-size:10px;color:var(--navyM)">https://api.his-bridge.healthv.vn/fhir/r4</code></div>
+        <div class="g2" style="gap:8px">
+          ${[
+            {m:"GET",r:"Patient",ep:"/Patient/PT-001",col:"#059669"},
+            {m:"GET",r:"Condition",ep:"/Condition?patient=PT-001",col:"#0EA5E9"},
+            {m:"GET",r:"MedicationRequest",ep:"/MedicationRequest?patient=PT-001",col:"#7C3AED"},
+            {m:"GET",r:"Observation",ep:"/Observation?category=laboratory",col:"#D97706"},
+          ].map(ep=>`
+            <button onclick="callAPIDemo('${ep.r}')" style="padding:10px 12px;background:${ep.col}12;border:1.5px solid ${ep.col}40;border-radius:8px;cursor:pointer;text-align:left;transition:all .15s;font-family:inherit" onmouseover="this.style.background='${ep.col}22'" onmouseout="this.style.background='${ep.col}12'">
+              <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+                ${badge(ep.m,ep.col)}
+                <span style="font-size:11px;font-weight:700;color:${ep.col}">${ep.r}</span>
+              </div>
+              <div style="font-size:9px;color:var(--g5);font-family:monospace">${ep.ep}</div>
+            </button>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">FHIR Resources hỗ trợ</div>
+        ${[["Patient","Thông tin BN (MPI-linked)"],["Encounter","Lượt khám/nhập viện"],["Condition","Chẩn đoán ICD-10-VN"],["MedicationRequest","Đơn thuốc + ATC code"],["Observation","Xét nghiệm + LOINC"],["DiagnosticReport","Báo cáo chẩn đoán"],["AllergyIntolerance","Dị ứng thuốc"],["Immunization","Tiêm chủng"]].map(([r,d])=>`
+          <div style="display:flex;gap:8px;margin-bottom:5px;align-items:center">
+            <code style="font-size:10px;background:var(--navyL);color:var(--navyM);padding:1px 7px;border-radius:4px;font-family:monospace;min-width:140px">${r}</code>
+            <span style="font-size:10px;color:var(--g5)">${d}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Response Preview</div>
+        <div id="api-result" style="text-align:center;padding:40px 0;color:var(--g5)">
+          <div style="font-size:30px;margin-bottom:10px">⚡</div>
+          <p style="font-size:12px">Chọn endpoint để xem FHIR R4 response</p>
+        </div>
+      </div>
+      <div class="card" style="background:var(--tealL);border-color:var(--tealM)">
+        <div class="card-title" style="color:var(--teal)">Security & Compliance</div>
+        ${[
+          ["OAuth2 / SMART on FHIR","Chuẩn y tế quốc tế"],
+          ["RBAC","Bác sĩ / BV / Researcher / Patient"],
+          ["Consent enforcement","Mỗi call kiểm tra patient consent"],
+          ["WORM Audit Trail","NĐ 13/2023 — immutable log"],
+          ["VNG Cloud VN","Luật Dữ liệu 32/2024 — data residency"],
+          ["Rate limiting","100 req/min free · Unlimited enterprise"],
+        ].map(([k,v])=>`
+          <div style="display:flex;gap:8px;margin-bottom:6px">
+            <span style="color:var(--greenM);flex-shrink:0">✓</span>
+            <div><span style="font-size:11px;font-weight:600;color:var(--teal)">${k}</span> <span style="font-size:10px;color:var(--g3)">— ${v}</span></div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>
+  </div>`;
+}
+function callAPIDemo(resource){
+  const el=document.getElementById('api-result');
+  if(!el)return;
+  el.innerHTML=`<div style="text-align:center;padding:30px 0"><div style="width:28px;height:28px;border:3px solid var(--g8);border-top-color:var(--tealM);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div><p style="font-size:11px;color:var(--g5)">Querying FHIR R4...</p></div>`;
+  setTimeout(()=>{
+    const data=FHIR_SAMPLES[resource]||{resourceType:resource,note:"Demo response"};
+    el.innerHTML=`
+      <div style="display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap">
+        ${badge("200 OK","#059669")} ${badge("GET /fhir/r4/"+resource,"#0B2D5E")} ${badge("FHIR R4","#7C3AED")}
+        ${badge("12ms","#059669")}
+      </div>
+      <pre>${JSON.stringify(data,null,2)}</pre>`;
+  },900);
+}
+
+// ─── PRICING ──────────────────────────────────────────────
+function renderPricing(){
+  return `<div class="fadein">
+  <div style="text-align:center;margin-bottom:28px">
+    <h2 style="font-size:22px;font-weight:800;color:var(--navy);margin-bottom:6px">Mô hình Kinh doanh HIS Bridge</h2>
+    <p style="font-size:13px;color:var(--g5)">Giá trị tăng dần theo quy mô · Không lock-in · Bắt đầu miễn phí 3 tháng pilot</p>
+  </div>
+  <div class="g3" style="margin-bottom:22px">
+    ${[
+      {plan:"Starter",price:"5M",unit:"VND/tháng",col:"#059669",target:"Phòng khám tư",features:["1 HIS kết nối","≤5.000 patients","MPI cơ bản","FHIR R4 API","Email support"],hi:false},
+      {plan:"Growth",price:"20M",unit:"VND/tháng",col:"#0EA5E9",target:"BV tư hạng II–III",features:["5 HIS kết nối","≤50.000 patients","MPI production","DQ Dashboard","Priority support","EvalAIH integration"],hi:true},
+      {plan:"Enterprise",price:"Custom",unit:"thỏa thuận",col:"#7C3AED",target:"BV hạng I, Chuỗi BV",features:["Không giới hạn HIS","Không giới hạn patients","Custom Adapter","On-premise option","SLA 99.9%","Dedicated support"],hi:false},
+    ].map(p=>`
+      <div class="price-card" style="background:${p.hi?'var(--navy)':'white'};border:${p.hi?'2px':'1.5px'} solid ${p.hi?p.col:'var(--g8)'};box-shadow:${p.hi?'0 8px 32px rgba(11,45,94,.25)':'0 1px 4px rgba(0,0,0,.06)'}">
+        ${p.hi?`<div style="text-align:center;margin-bottom:6px"><span style="background:${p.col};color:white;font-size:10px;font-weight:700;padding:2px 14px;border-radius:20px">PHỔ BIẾN NHẤT</span></div>`:''}
+        <div style="font-size:11px;color:${p.hi?'#8AAEC8':'var(--g5)'};margin-bottom:3px">${p.target}</div>
+        <div style="font-size:20px;font-weight:900;color:${p.hi?'white':p.col};margin-bottom:3px">${p.plan}</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:16px">
+          <span style="font-size:28px;font-weight:900;color:${p.hi?'white':p.col};font-family:monospace">${p.price}</span>
+          <span style="font-size:12px;color:${p.hi?'#8AAEC8':'var(--g5)'}">${p.unit}</span>
+        </div>
+        ${p.features.map(f=>`
+          <div style="display:flex;gap:7px;margin-bottom:6px">
+            <span style="color:${p.hi?'var(--tealM)':'var(--greenM)'};font-size:12px;flex-shrink:0">✓</span>
+            <span style="font-size:11px;color:${p.hi?'#CBD5E1':'var(--g3)'}">${f}</span>
+          </div>`).join('')}
+        <button onclick="alert('Demo: Liên hệ HealthV MedTech để pilot miễn phí 3 tháng')" style="margin-top:16px;width:100%;padding:10px 0;background:${p.hi?p.col:'transparent'};border:1.5px solid ${p.col};border-radius:8px;font-size:12px;font-weight:700;color:${p.hi?'white':p.col};cursor:pointer;font-family:inherit;transition:all .15s">
+          ${p.price==="Custom"?"Liên hệ tư vấn →":"Bắt đầu dùng thử →"}
+        </button>
+      </div>`).join('')}
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Luồng doanh thu bổ sung</div>
+      ${[
+        ["🔌","Implementation Service","Build Adapter cho HIS mới","50–300M VND/lần","Liên tục"],
+        ["📊","DQ as a Service","Báo cáo DQ + benchmark peer group","10–50M VND/năm","G1+"],
+        ["⚡","API Revenue","Per-call cho AI developer third-party","$0.001–0.01/call","G2+"],
+        ["🔬","Research Data Access","Federated query cho nghiên cứu lâm sàng","100–500M VND/study","G2+"],
+      ].map(([ic,name,desc,price,from])=>`
+        <div style="display:flex;gap:10px;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--g8)">
+          <span style="font-size:20px;flex-shrink:0">${ic}</span>
+          <div style="flex:1">
+            <div style="font-size:11px;font-weight:700;color:var(--navy)">${name}</div>
+            <div style="font-size:10px;color:var(--g3)">${desc}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:10px;font-weight:700;color:var(--greenM)">${price}</div>
+            <div style="font-size:9px;color:var(--g5)">từ ${from}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Lộ trình Revenue (ước tính nội bộ)</div>
+      ${[
+        {label:"G0 — Tháng 1–3",detail:"1 BV pilot (miễn phí)",rev:"0 — Build trust & data",col:"#94A3B8"},
+        {label:"G1 — Tháng 4–9",detail:"3–5 BV · Implementation services",rev:"150–500M VND/tháng",col:"#D97706"},
+        {label:"G2 — Tháng 10–18",detail:"20+ BV · API · DQ SaaS",rev:"500M–2 tỷ VND/tháng",col:"#059669"},
+        {label:"G3 — Năm 2–3",detail:"100+ BV · Enterprise · Research",rev:"2–8 tỷ VND/tháng",col:"#0B2D5E"},
+      ].map(r=>`
+        <div style="margin-bottom:10px;padding:11px 14px;background:var(--bg);border-radius:8px;border-left:4px solid ${r.col}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:${r.col}">${r.label}</div>
+              <div style="font-size:10px;color:var(--g3)">${r.detail}</div>
+            </div>
+            <div style="font-size:11px;font-weight:800;color:${r.col};text-align:right;max-width:140px">${r.rev}</div>
+          </div>
+        </div>`).join('')}
+      <div style="padding:9px 12px;background:var(--navyL);border-radius:7px;font-size:10px;color:var(--navyM);font-weight:500;border:1px solid var(--navyM)40">
+        ⚠ Ước tính nội bộ HealthV — cần validate qua pilot thực tế trước khi dùng trong investor materials chính thức.
+      </div>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// CONNECT MODAL
+// ══════════════════════════════════════════════════════════
+const STEPS=["Thông tin HIS","Chọn Adapter","Kiểm tra kết nối","Hoàn tất"];
+function openModal(){STATE.connectStep=0;STATE.connectData={name:"",vendor:"medisoft",type:"SQL"};renderModal();document.getElementById('connect-modal').style.display='flex';}
+function closeModal(){document.getElementById('connect-modal').style.display='none';}
+
+function renderModal(){
+  // Steps
+  document.getElementById('step-wrap').innerHTML=STEPS.map((s,i)=>`
+    <div class="step-item">
+      <div class="step-circle" style="background:${i<=STATE.connectStep?'var(--tealM)':'var(--g8)'};color:${i<=STATE.connectStep?'white':'var(--g5)'}">${i+1}</div>
+      <div style="font-size:9px;color:${i<=STATE.connectStep?'var(--tealM)':'var(--g5)'};font-weight:${i===STATE.connectStep?700:400}">${s}</div>
+    </div>`).join('');
+
+  // Content
+  const sc=STATE.connectStep;
+  let content='';
+  if(sc===0){
+    content=`
+      <div style="display:grid;gap:12px">
+        <div><label>Tên bệnh viện / phòng khám</label>
+          <input type="text" id="cn-name" value="${STATE.connectData.name}" placeholder="VD: BV Đa khoa Hòa Bình" oninput="STATE.connectData.name=this.value"></div>
+        <div><label>Nhà cung cấp HIS</label>
+          <select id="cn-vendor" onchange="STATE.connectData.vendor=this.value">
+            ${[["medisoft","Medisoft"],["isofh","iSofH"],["vnpt","VNPT-IT HIS"],["oracle","Oracle Health (Cerner)"],["cmc","CMC HIS"],["custom","Phần mềm tự viết / Khác"]].map(([v,l])=>`<option value="${v}"${STATE.connectData.vendor===v?' selected':''}>${l}</option>`).join('')}
+          </select></div>
+        <div style="padding:10px 12px;background:var(--tealL);border-radius:8px;font-size:11px;color:var(--teal);border:1px solid var(--tealM)40">
+          ✓ Adapter sẽ chỉ đọc (read-only) — không ghi vào HIS, không ảnh hưởng vận hành
+        </div>
+      </div>`;
+  } else if(sc===1){
+    content=`
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:10px">Chọn loại Adapter phù hợp:</div>
+        <div class="g2" style="gap:8px">
+          ${Object.entries(ADAPTER).map(([k,at])=>`
+            <div onclick="STATE.connectData.type='${k}';renderModal()" style="padding:10px 12px;border:2px solid ${STATE.connectData.type===k?at.col:'var(--g8)'};border-radius:8px;cursor:pointer;background:${STATE.connectData.type===k?at.col+'12':'white'};transition:all .15s">
+              <div style="font-size:11px;font-weight:700;color:${at.col}">${at.label}</div>
+              <div style="font-size:10px;color:var(--g5)">${at.desc}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  } else if(sc===2){
+    content=`
+      <div style="text-align:center;padding:20px 0">
+        <div style="width:44px;height:44px;border:4px solid var(--g8);border-top-color:var(--tealM);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px">Đang kiểm tra kết nối...</div>
+        ${["✓ Ping thành công","✓ Read-only access OK","✓ Schema detected","✓ ICD-10 mapping found"].map(s=>`<div style="font-size:11px;color:var(--greenM);margin-bottom:4px">${s}</div>`).join('')}
+      </div>`;
+  } else {
+    content=`
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:48px;margin-bottom:12px">🎉</div>
+        <div style="font-size:16px;font-weight:800;color:var(--greenM);margin-bottom:6px">Kết nối thành công!</div>
+        <div style="font-size:12px;color:var(--g3);margin-bottom:4px">${STATE.connectData.name||"HIS mới"} đã được thêm vào Bridge</div>
+        <div style="font-size:11px;color:var(--g5)">Sync dữ liệu đầu tiên bắt đầu trong 15 phút</div>
+      </div>`;
+  }
+  document.getElementById('step-content').innerHTML=content;
+
+  // Buttons
+  let btns='';
+  if(sc>0&&sc<3) btns+=`<button onclick="prevStep()" style="padding:9px 20px;border:1.5px solid var(--g8);border-radius:8px;font-size:13px;background:white;color:var(--g3);cursor:pointer;font-family:inherit">← Quay lại</button>`;
+  if(sc<3) btns+=`<button onclick="nextStep()" style="padding:9px 20px;background:var(--tealM);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">${sc===2?"Xác nhận":"Tiếp tục →"}</button>`;
+  if(sc===3) btns+=`<button onclick="closeModal()" style="padding:9px 22px;background:var(--navy);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Hoàn tất ✓</button>`;
+  document.getElementById('step-btns').innerHTML=btns;
+}
+
+function nextStep(){
+  if(STATE.connectStep===2){
+    STATE.connectStep=3;renderModal();return;
+  }
+  STATE.connectStep=Math.min(STATE.connectStep+1,3);
+  if(STATE.connectStep===2){renderModal();setTimeout(()=>{STATE.connectStep=3;renderModal();},2200);}
+  else renderModal();
+}
+function prevStep(){STATE.connectStep=Math.max(STATE.connectStep-1,0);renderModal();}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function init(){
+  initTabs();
+  renderPane('dashboard');
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
