@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MedTech HOPT</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#F0F4F8;color:#1E293B;min-height:100vh}
+:root{
+  --navy:#0B2D5E;--navyM:#1A4A8A;--navyL:#EEF2FB;
+  --teal:#006D6B;--tealM:#00A896;--tealL:#E3F4F3;
+  --green:#065F46;--greenM:#059669;--greenL:#D1FAE5;
+  --gold:#92400E;--goldM:#D97706;--goldL:#FEF3C7;
+  --red:#B91C1C;--redM:#DC2626;--redL:#FEE2E2;
+  --blue:#1E40AF;--blueM:#3B82F6;--blueL:#EFF6FF;
+  --purp:#5B21B6;--purpM:#7C3AED;--purpL:#F5F3FF;
+  --orange:#EA580C;--orangeL:#FFF7ED;
+  --g1:#1E293B;--g3:#475569;--g5:#94A3B8;--g8:#E2E8F0;
+  --white:#FFFFFF;--bg:#F8FAFC;
+}
+/* Layout */
+.header{background:var(--navy);padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,.3)}
+.header-inner{max-width:1400px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between}
+#app{max-width:1400px;margin:0 auto;padding:20px 24px 60px}
+/* Tabs */
+.tabs{display:flex;gap:2px;background:white;border-radius:12px;padding:4px;margin-bottom:22px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow-x:auto}
+.tab{flex:1;min-width:100px;padding:8px 6px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--g5);font-family:inherit;transition:all .15s;white-space:nowrap;text-align:center}
+.tab:hover{background:var(--navyL);color:var(--navy)}
+.tab.active{background:var(--navy);color:white;font-weight:700}
+/* Cards */
+.card{background:white;border-radius:12px;padding:18px 20px;border:1px solid var(--g8);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-sm{background:white;border-radius:10px;padding:14px 16px;border:1px solid var(--g8)}
+/* Grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.g5c{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+/* Stats */
+.stat{background:var(--bg);border-radius:10px;padding:14px 16px;border:1px solid var(--g8);text-align:center}
+.stat-val{font-size:26px;font-weight:800;font-family:monospace}
+.stat-lbl{font-size:10px;color:var(--g5);font-weight:600;letter-spacing:.5px;margin-bottom:3px}
+.stat-sub{font-size:10px;color:var(--g5);margin-top:2px}
+/* Progress */
+.prog{height:7px;background:var(--g8);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width .6s ease}
+/* Buttons */
+.btn-p{padding:9px 20px;background:var(--tealM);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p:hover{background:#008a7a}
+.btn-p:disabled{opacity:.5;cursor:not-allowed}
+.btn-s{padding:6px 14px;border:1.5px solid var(--g8);border-radius:6px;background:white;font-size:11px;font-weight:600;cursor:pointer;color:var(--g3);font-family:inherit;transition:all .15s}
+.btn-s:hover{background:var(--tealL);border-color:var(--tealM);color:var(--teal)}
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+/* Status */
+.sdot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+/* Input */
+input,select,textarea{width:100%;padding:9px 12px;border:1.5px solid var(--g8);border-radius:8px;font-size:13px;font-family:inherit;color:var(--g1);background:white;outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--tealM)}
+label{font-size:11px;font-weight:600;color:var(--g5);display:block;margin-bottom:4px;letter-spacing:.4px}
+/* Modal */
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center}
+.modal{background:white;border-radius:16px;padding:28px;width:600px;max-width:94vw;box-shadow:0 24px 64px rgba(0,0,0,.3);max-height:88vh;overflow-y:auto}
+/* Alerts */
+.alert{padding:12px 16px;border-radius:9px;border:1px solid;margin-bottom:12px;font-size:12px;line-height:1.6}
+.alert-g{background:var(--greenL);border-color:var(--greenM);color:var(--green)}
+.alert-y{background:var(--goldL);border-color:var(--goldM);color:var(--gold)}
+.alert-r{background:var(--redL);border-color:var(--redM);color:var(--red)}
+.alert-b{background:var(--blueL);border-color:var(--blueM);color:var(--blue)}
+/* Animations */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideright{from{transform:translateX(-20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.fadein{animation:fadein .3s ease}
+.spin{animation:spin .7s linear infinite}
+/* Tags */
+.tag-g{font-size:10px;background:var(--greenL);color:var(--greenM);padding:2px 8px;border-radius:12px;font-weight:700;border:1px solid var(--greenM)40}
+.tag-r{font-size:10px;background:var(--redL);color:var(--redM);padding:2px 8px;border-radius:12px;font-weight:700;border:1px solid var(--redM)40}
+.tag-y{font-size:10px;background:var(--goldL);color:var(--goldM);padding:2px 8px;border-radius:12px;font-weight:700;border:1px solid var(--goldM)40}
+.tag-b{font-size:10px;background:var(--blueL);color:var(--blueM);padding:2px 8px;border-radius:12px;font-weight:700;border:1px solid var(--blueM)40}
+/* Table */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:var(--navy);color:white;padding:9px 12px;text-align:left;font-weight:600;font-size:11px}
+.data-table td{padding:9px 12px;border-bottom:1px solid #F1F5F9;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:nth-child(even) td{background:#FAFBFD}
+/* Timeline */
+.timeline{display:flex;gap:0;overflow-x:auto;padding-bottom:8px}
+.tl-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:80px}
+.tl-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;z-index:1;flex-shrink:0;position:relative}
+.tl-line{flex:1;height:3px;margin-top:17px;align-self:flex-start}
+.tl-label{font-size:10px;color:var(--g5);margin-top:6px;text-align:center;line-height:1.3}
+/* ROI counter */
+.roi-num{font-size:36px;font-weight:900;font-family:monospace;color:var(--greenM)}
+/* Panes */
+.pane{display:none}.pane.active{display:block}
+/* Pre */
+pre{font-size:10px;background:#0B2D5E;color:#A8EDEA;padding:14px;border-radius:8px;overflow:auto;max-height:220px;font-family:monospace;line-height:1.6}
+@media(max-width:768px){.g2,.g3,.g4,.g5c{grid-template-columns:1fr}.timeline{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:#0B2D5E;display:flex;align-items:center;justify-content:center;overflow:auto"></div>
+
+<!-- MAIN APP (hidden until login) -->
+<div id="main-app" style="display:none">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:36px;height:36px;background:var(--tealM);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;font-size:16px;flex-shrink:0">S</div>
+      <div>
+        <div style="font-weight:800;font-size:16px;color:white;letter-spacing:-.3px">SIB</div>
+        <div style="font-size:9px;color:var(--tealM);letter-spacing:2px;font-weight:700">HIS · LIS · PACS INTERCONNECTION BRIDGE · Copyright @Hoang Thuong</div>
+      </div>
+      <div style="margin-left:10px;padding:3px 11px;background:rgba(0,168,150,.15);border:1px solid rgba(0,168,150,.4);border-radius:20px;display:flex;align-items:center;gap:5px">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--tealM);animation:pulse 1.4s infinite;display:inline-block"></span>
+        <span style="font-size:10px;color:var(--tealM);font-weight:700">MVP DEMO</span>
+      </div>
+    </div>
+    <div id="tab-header" style="display:flex;gap:3px"></div>
+    <div style="font-size:11px;color:#8AAEC8;text-align:right">For Investors & BYT<br>Q1/2026 Demo</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="tabs" id="tabs-row"></div>
+  <div id="pane-dashboard"  class="pane active"></div>
+  <div id="pane-patients"   class="pane"></div>
+  <div id="pane-reuse"      class="pane"></div>
+  <div id="pane-lis"        class="pane"></div>
+  <div id="pane-pacs"       class="pane"></div>
+  <div id="pane-portal"     class="pane"></div>
+  <div id="pane-security"   class="pane"></div>
+  <div id="pane-rbac"       class="pane"></div>
+  <div id="pane-roi"        class="pane"></div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal" style="display:none">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<script>
+
+// ══════════════════════════════════════════════════════════
+// LOGIN SYSTEM — RBAC from first screen
+// ══════════════════════════════════════════════════════════
+
+let CURRENT_USER = null; // Active logged-in user
+
+const LOGIN_USERS = {
+  patient:      {role:"patient",      name:"Nguyễn Văn An",     id:"SIB-2024-001", bv:"",     credential:"001065012345", hint:"CCCD: 001065012345",  pin:"123456", patientId:"SIB-2024-001"},
+  doctor_own:   {role:"doctor_own",   name:"BS. Trần Minh Hùng",id:"BS-BM-001",    bv:"bv_a", credential:"BS-HANOI-0451",hint:"Mã hành nghề",        pin:"654321"},
+  doctor_other: {role:"doctor_other", name:"BS. Lê Thị Hoa",    id:"BS-VM-002",    bv:"bv_b", credential:"BS-HN-0892",   hint:"Mã hành nghề",        pin:"111222"},
+  emergency_doc:{role:"emergency_doc",name:"BS. Vũ Minh Tuấn",  id:"BS-ER-003",    bv:"bv_d", credential:"ER-TOKEN-2024",hint:"Emergency token",     pin:"999000"},
+  nurse:        {role:"nurse",        name:"ĐD. Nguyễn Thị Thu",id:"NU-BM-001",    bv:"bv_a", credential:"NU-BM-2024",   hint:"BV credential",       pin:"246810"},
+  bv_manager:   {role:"bv_manager",   name:"TS. Nguyễn Bá Hoàng",id:"MGR-BM-001", bv:"bv_a", credential:"ADMIN-BM-001", hint:"Admin credential",    pin:"135790"},
+  researcher:   {role:"researcher",   name:"GS. Phạm Thị Lan",  id:"RES-YHN-001", bv:"",     credential:"IRB-2024-055",  hint:"IRB token",           pin:"777888"},
+  sib_admin:    {role:"sib_admin",    name:"KS. Trần Đức Anh",  id:"SIB-ADM-001", bv:"",     credential:"HEALTHV-ADM",  hint:"Hardware key ID",     pin:"000111"},
+  pharmacist:   {role:"pharmacist",   name:"DS. Lê Hoàng Minh", id:"PH-BM-001",   bv:"bv_a", credential:"PH-BM-2024",   hint:"Dược sĩ license",     pin:"369147"},
+};
+
+const LOGIN_ROLE_INFO = {
+  patient:       {label:"Người bệnh",          icon:"👤", col:"#7C3AED", bg:"#F5F3FF", authSteps:["Nhập CCCD / BHYT","Xác thực khuôn mặt (eKYC)","Nhập OTP SMS"]},
+  doctor_own:    {label:"Bác sĩ (BV của mình)",icon:"👨‍⚕️",col:"#059669", bg:"#D1FAE5", authSteps:["Mã hành nghề BYT","BV Credential","MFA (TOTP)"]},
+  doctor_other:  {label:"Bác sĩ (BV khác)",    icon:"👨‍⚕️",col:"#0EA5E9", bg:"#EFF6FF", authSteps:["Mã hành nghề BYT","BV Credential","MFA (TOTP)"]},
+  emergency_doc: {label:"Bác sĩ Cấp cứu",      icon:"🚨", col:"#DC2626", bg:"#FEE2E2", authSteps:["Emergency Token","Dual Authorization","Break-glass confirm"]},
+  nurse:         {label:"Điều dưỡng",           icon:"👩‍⚕️",col:"#D97706", bg:"#FEF3C7", authSteps:["BV Credential","MFA (TOTP)"]},
+  bv_manager:    {label:"Quản lý BV",           icon:"📊", col:"#1A4A8A", bg:"#EEF2FB", authSteps:["Admin Credential","Hardware Key (YubiKey)"]},
+  researcher:    {label:"Nghiên cứu viên",      icon:"🔬", col:"#7C3AED", bg:"#F5F3FF", authSteps:["Institution Account","IRB Token","Research PIN"]},
+  sib_admin:     {label:"SIB Admin (HealthV)",  icon:"⚙️", col:"#475569", bg:"#F1F5F9", authSteps:["Hardware Key","Dual Admin Auth","VPN + PIN"]},
+  pharmacist:    {label:"Dược sĩ",              icon:"💊", col:"#EA580C", bg:"#FFF7ED", authSteps:["Dược sĩ License","BV Credential","MFA"]},
+};
+
+// Which tabs each role can see
+const ROLE_TABS = {
+  patient:       ["dashboard","portal","security"],
+  doctor_own:    ["dashboard","patients","reuse","lis","pacs","security","roi"],
+  doctor_other:  ["dashboard","patients","reuse","lis","pacs","security"],
+  emergency_doc: ["dashboard","patients","reuse","lis","pacs","security"],
+  nurse:         ["dashboard","patients","lis","security"],
+  bv_manager:    ["dashboard","security","roi"],
+  researcher:    ["dashboard","security"],
+  sib_admin:     ["dashboard","security","roi"],
+  pharmacist:    ["dashboard","patients","lis","security"],
+};
+
+// Tab labels (full set)
+const ALL_TAB_LABELS = {
+  dashboard:"📊 Dashboard", patients:"👤 Patient MPI", reuse:"⚡ Smart Reuse",
+  lis:"🧪 LIS Results", pacs:"🩻 PACS Imaging", portal:"🏠 Hồ sơ của tôi",
+  security:"🔒 Bảo mật", roi:"💰 ROI & Đầu tư",
+};
+
+let LOGIN_STATE = {step:1, selectedRole:null, credVal:"", pinVal:"", ekycDone:false, otpVal:"", loading:false};
+
+function renderLoginScreen(){
+  const el = document.getElementById('login-screen');
+  if(!el) return;
+  const ls = LOGIN_STATE;
+
+  if(ls.loading){
+    el.innerHTML = `
+    <div style="text-align:center;color:white">
+      <div style="width:56px;height:56px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--tealM);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px"></div>
+      <div style="font-size:18px;font-weight:700">Đang xác thực...</div>
+      <div style="font-size:13px;color:#8AAEC8;margin-top:6px">Kiểm tra quyền truy cập SIB</div>
+    </div>`;
+    return;
+  }
+
+  if(ls.step===1){
+    // STEP 1: Choose role
+    el.innerHTML = `
+    <div style="width:100%;max-width:780px;padding:24px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="display:inline-flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:44px;height:44px;background:var(--tealM);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;font-size:20px">S</div>
+          <div style="text-align:left">
+            <div style="font-size:22px;font-weight:900;color:white;letter-spacing:-.5px">MedTech HOPT</div>
+            <div style="font-size:10px;color:var(--tealM);letter-spacing:2px;font-weight:700">Copyright @Hoang Thuong</div>
+          </div>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:white;margin-bottom:4px">Chọn vai trò để đăng nhập</div>
+        <div style="font-size:12px;color:#8AAEC8">Mỗi vai trò có quyền hạn và giao diện riêng · Zero-trust access control</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        ${Object.entries(LOGIN_ROLE_INFO).map(([k,r])=>{
+          const usr = LOGIN_USERS[k];
+          const sel = ls.selectedRole===k;
+          return `
+          <div onclick="selectLoginRole('${k}')" style="background:${sel?r.bg:'rgba(255,255,255,.07)'};border:2px solid ${sel?r.col:'rgba(255,255,255,.15)'};border-radius:12px;padding:14px;cursor:pointer;transition:all .15s">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:20px">${r.icon}</span>
+              <span style="font-size:12px;font-weight:700;color:${sel?r.col:'white'}">${r.label}</span>
+            </div>
+            <div style="font-size:10px;color:${sel?r.col+'CC':'rgba(255,255,255,.5)'};margin-bottom:6px">${usr.name}</div>
+            <div style="display:flex;gap:3px;flex-wrap:wrap">
+              ${r.authSteps.map(s=>`<span style="font-size:9px;background:${sel?r.col+'20':'rgba(255,255,255,.1)'};color:${sel?r.col:'rgba(255,255,255,.6)'};padding:1px 6px;border-radius:8px">${s}</span>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="text-align:center;margin-top:20px">
+        <button onclick="goLoginStep2()" style="padding:12px 40px;background:${ls.selectedRole?'var(--tealM)':'rgba(255,255,255,.2)'};color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:${ls.selectedRole?'pointer':'not-allowed'};font-family:inherit;transition:all .2s">
+          Tiếp tục →
+        </button>
+      </div>
+    </div>`;
+    return;
+  }
+
+  if(ls.step===2){
+    // STEP 2: Enter credentials
+    const rkey = ls.selectedRole;
+    const ri = LOGIN_ROLE_INFO[rkey];
+    const usr = LOGIN_USERS[rkey];
+    const isPatient = rkey==='patient';
+    const isEmergency = rkey==='emergency_doc';
+
+    el.innerHTML = `
+    <div style="width:100%;max-width:460px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <button onclick="LOGIN_STATE.step=1;renderLoginScreen()" style="background:rgba(255,255,255,.1);border:none;color:white;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:14px">←</button>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:22px">${ri.icon}</div>
+          <div style="font-size:14px;font-weight:700;color:${ri.col}">${ri.label}</div>
+          <div style="font-size:11px;color:#8AAEC8">${usr.name}</div>
+        </div>
+        <div style="width:32px"></div>
+      </div>
+
+      ${isPatient?`
+      <!-- Patient: CCCD + eKYC + OTP -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:#8AAEC8;margin-bottom:5px">SỐ CCCD / BHYT</div>
+        <input type="text" id="cred-input" value="${usr.credential}" placeholder="${usr.hint}"
+          style="width:100%;padding:10px 14px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:8px;font-size:14px;color:white;font-family:inherit;outline:none">
+      </div>
+      <div style="margin-bottom:14px;padding:12px;background:${ls.ekycDone?'rgba(5,150,105,.2)':'rgba(255,255,255,.07)'};border:1px solid ${ls.ekycDone?'#059669':'rgba(255,255,255,.1)'};border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:${ls.ekycDone?'#34D399':'#8AAEC8'}">📷 Xác thực khuôn mặt (eKYC)</div>
+            <div style="font-size:10px;color:${ls.ekycDone?'#34D399':'#8AAEC8'}">${ls.ekycDone?'✅ Đã xác thực':'Nhấn để mô phỏng'}</div>
+          </div>
+          ${ls.ekycDone?'<span style="font-size:20px">✅</span>':`<button onclick="simulateEKYC()" style="padding:5px 12px;background:var(--tealM);border:none;border-radius:6px;color:white;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Scan</button>`}
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:#8AAEC8;margin-bottom:5px">OTP SMS (6 số) <span style="color:#475569">· Demo: nhập bất kỳ 6 số</span></div>
+        <input type="text" id="otp-input" maxlength="6" value="${ls.otpVal}" oninput="LOGIN_STATE.otpVal=this.value" placeholder="------"
+          style="width:100%;padding:10px 14px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:8px;font-size:20px;color:white;font-family:monospace;text-align:center;letter-spacing:8px;outline:none">
+      </div>`:`
+      <!-- Other roles: credential + PIN -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:#8AAEC8;margin-bottom:5px">${ri.authSteps[0].toUpperCase()} <span style="color:#475569">· Gợi ý: ${usr.hint}</span></div>
+        <input type="text" id="cred-input" value="${usr.credential}" placeholder="${usr.hint}"
+          style="width:100%;padding:10px 14px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:8px;font-size:13px;color:white;font-family:monospace;outline:none">
+      </div>
+      ${isEmergency?`
+      <div style="margin-bottom:14px;padding:10px 14px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.5);border-radius:8px">
+        <div style="font-size:11px;font-weight:700;color:#FCA5A5;margin-bottom:2px">🚨 Break-glass Protocol</div>
+        <div style="font-size:10px;color:#FCA5A5">Dual authorization bắt buộc. Alert sẽ gửi đến BN + BV gốc + Admin ngay khi đăng nhập.</div>
+      </div>`:''}
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:#8AAEC8;margin-bottom:5px">${ri.authSteps[1]||'MFA PIN'} <span style="color:#475569">· Demo PIN: ${usr.pin}</span></div>
+        <input type="password" id="pin-input" value="${ls.pinVal}" oninput="LOGIN_STATE.pinVal=this.value" placeholder="••••••"
+          style="width:100%;padding:10px 14px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:8px;font-size:20px;color:white;text-align:center;letter-spacing:6px;font-family:monospace;outline:none">
+      </div>`}
+
+      <div id="login-error" style="display:none;margin-bottom:10px;padding:8px 12px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.4);border-radius:7px;font-size:11px;color:#FCA5A5"></div>
+
+      <button onclick="doLogin()" style="width:100%;padding:13px;background:${ri.col};border:none;border-radius:10px;font-size:14px;font-weight:700;color:white;cursor:pointer;font-family:inherit;transition:all .2s">
+        ${isEmergency?'🚨 Xác nhận Break-glass Access':'🔐 Đăng nhập'}
+      </button>
+      <div style="text-align:center;margin-top:12px">
+        <span style="font-size:10px;color:#475569">Demo: credentials đã điền sẵn — nhấn Đăng nhập để thử</span>
+      </div>
+    </div>`;
+  }
+}
+
+function selectLoginRole(k){
+  LOGIN_STATE.selectedRole=k;
+  LOGIN_STATE.ekycDone=false;
+  LOGIN_STATE.pinVal='';
+  LOGIN_STATE.otpVal='';
+  renderLoginScreen();
+}
+
+function goLoginStep2(){
+  if(!LOGIN_STATE.selectedRole) return;
+  LOGIN_STATE.step=2;
+  renderLoginScreen();
+}
+
+function simulateEKYC(){
+  const el=document.getElementById('login-screen');
+  if(el){
+    const btn=el.querySelector('button[onclick="simulateEKYC()"]');
+    if(btn){btn.textContent='Scanning...';btn.disabled=true;}
+  }
+  setTimeout(()=>{LOGIN_STATE.ekycDone=true;renderLoginScreen();},1400);
+}
+
+function doLogin(){
+  const rkey=LOGIN_STATE.selectedRole;
+  const usr=LOGIN_USERS[rkey];
+  const isPatient=rkey==='patient';
+  const errEl=document.getElementById('login-error');
+
+  // Validate
+  const credEl=document.getElementById('cred-input');
+  const cred=credEl?credEl.value.trim():'';
+
+  if(isPatient){
+    if(!LOGIN_STATE.ekycDone){
+      if(errEl){errEl.style.display='block';errEl.textContent='⚠ Vui lòng hoàn tất xác thực khuôn mặt (eKYC)';}
+      return;
+    }
+    const otp=document.getElementById('otp-input')?.value||'';
+    if(otp.length<4){
+      if(errEl){errEl.style.display='block';errEl.textContent='⚠ Vui lòng nhập mã OTP 6 số';}
+      return;
+    }
+    if(cred!==usr.credential){
+      if(errEl){errEl.style.display='block';errEl.textContent='⚠ CCCD không đúng. Demo: '+usr.credential;}
+      return;
+    }
+  } else {
+    const pin=document.getElementById('pin-input')?.value||'';
+    if(pin!==usr.pin){
+      if(errEl){errEl.style.display='block';errEl.textContent='⚠ PIN không đúng. Demo PIN: '+usr.pin;}
+      return;
+    }
+  }
+
+  // Auth success → loading
+  LOGIN_STATE.loading=true;
+  renderLoginScreen();
+
+  setTimeout(()=>{
+    CURRENT_USER = {...usr};
+    // Show app
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-app').style.display='block';
+    // Show notification for emergency
+    if(rkey==='emergency_doc'){
+      setTimeout(()=>showBreakGlassAlert(),400);
+    }
+    // Init app with role
+    initAppForRole(CURRENT_USER);
+  }, 1800);
+}
+
+function showBreakGlassAlert(){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;top:80px;right:20px;z-index:999;background:#DC2626;color:white;padding:14px 18px;border-radius:12px;font-size:12px;box-shadow:0 4px 24px rgba(220,38,38,.5);max-width:300px;animation:fadein .3s ease';
+  overlay.innerHTML='<div style="font-weight:800;font-size:13px;margin-bottom:4px">🚨 Break-glass Alert Sent</div><div>Đã thông báo: BN Phạm Thị Dung, BV Bạch Mai, SIB Admin HealthV</div><div style="font-size:10px;margin-top:4px;opacity:.8">Quyền tự hết sau 24h · Mọi action đang được ghi log</div>';
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.remove(),6000);
+}
+
+function initAppForRole(user){
+  const allowedTabs = ROLE_TABS[user.role]||['dashboard'];
+  // Update header
+  updateHeader(user);
+  // Build tabs
+  const tabsRow=document.getElementById('tabs-row');
+  if(tabsRow){
+    tabsRow.innerHTML=allowedTabs.map(id=>`<button class="tab${id==='dashboard'?' active':''}" onclick="switchTab('${id}')">${ALL_TAB_LABELS[id]||id}</button>`).join('');
+  }
+  // Show first tab
+  S.tab='dashboard';
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  const dp=document.getElementById('pane-dashboard');
+  if(dp) dp.classList.add('active');
+  renderPane('dashboard');
+}
+
+function updateHeader(user){
+  const ri=LOGIN_ROLE_INFO[user.role];
+  const bvName=user.bv?getBV(user.bv).name:'';
+  // Update header user info area
+  const hRight=document.querySelector('.header-inner > div:last-child');
+  if(hRight){
+    hRight.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="text-align:right">
+        <div style="font-size:12px;font-weight:700;color:white">${user.name}</div>
+        <div style="font-size:10px;color:${ri.col}">${ri.icon} ${ri.label}${bvName?' · '+bvName:''}</div>
+      </div>
+      <div style="width:34px;height:34px;border-radius:50%;background:${ri.col};display:flex;align-items:center;justify-content:center;font-size:16px">${ri.icon}</div>
+      <button onclick="doLogout()" style="padding:5px 12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:white;font-size:11px;cursor:pointer;font-family:inherit" title="Đăng xuất">⏻</button>
+    </div>`;
+  }
+}
+
+function doLogout(){
+  CURRENT_USER=null;
+  LOGIN_STATE={step:1,selectedRole:null,credVal:'',pinVal:'',ekycDone:false,otpVal:'',loading:false};
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  renderLoginScreen();
+}
+
+// Override switchTab to check permissions
+const _origSwitchTab = typeof switchTab==='function'?switchTab:null;
+function switchTab(id){
+  if(CURRENT_USER){
+    const allowed=ROLE_TABS[CURRENT_USER.role]||['dashboard'];
+    if(!allowed.includes(id)){
+      showAccessDenied(id);
+      return;
+    }
+  }
+  S.tab=id;
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+id)?.classList.add('active');
+  // Update tab active state
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.toggle('active',t.textContent.trim()===ALL_TAB_LABELS[id]);
+  });
+  renderPane(id);
+}
+
+function showAccessDenied(tabId){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;top:80px;right:20px;z-index:999;background:#1A4A8A;color:white;padding:14px 18px;border-radius:12px;font-size:12px;box-shadow:0 4px 24px rgba(0,0,0,.3);max-width:300px;animation:fadein .3s ease';
+  const ri=LOGIN_ROLE_INFO[CURRENT_USER?.role||'patient'];
+  overlay.innerHTML=`<div style="font-weight:700;margin-bottom:4px">🚫 Không có quyền truy cập</div><div>Vai trò <strong>${ri.label}</strong> không được phép xem module này.</div><div style="font-size:10px;margin-top:4px;opacity:.7">Liên hệ SIB Admin nếu cần mở rộng quyền.</div>`;
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.remove(),3500);
+}
+
+// Override renderDashboard to be role-aware
+const _origRenderDashboard = renderDashboard;
+function renderDashboard(){
+  if(!CURRENT_USER) return _origRenderDashboard();
+  const role = CURRENT_USER.role;
+  if(role==='patient') return renderPatientDashboard();
+  if(role==='bv_manager') return renderManagerDashboard();
+  if(role==='researcher') return renderResearcherDashboard();
+  if(role==='sib_admin') return renderAdminDashboard();
+  return _origRenderDashboard(); // doctors, nurse, pharmacist see full dashboard
+}
+
+function renderPatientDashboard(){
+  const pt=PATIENTS.find(p=>p.id===CURRENT_USER.patientId)||PATIENTS[0];
+  const validLabs=pt.labs.filter(l=>l.status==="valid");
+  const expiredLabs=pt.labs.filter(l=>l.status==="expired");
+  const validImg=pt.imaging.filter(i=>i.status==="valid");
+  return `<div class="fadein">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div>
+    <h2 style="font-size:20px;font-weight:800;color:var(--navy)">Xin chào, ${pt.name} 👋</h2>
+    <p style="font-size:12px;color:var(--g5)">Hồ sơ sức khỏe tổng hợp · SIB ID: ${pt.id} · BV gốc: ${getBV(pt.bvGoc).name}</p>
+  </div>
+  <div style="padding:8px 14px;background:var(--greenL);border:1px solid var(--greenM);border-radius:10px;font-size:11px;color:var(--greenM);font-weight:600">✅ Đã đăng nhập an toàn (eKYC)</div>
+</div>
+<div class="g4" style="margin-bottom:20px">
+  <div class="stat"><div class="stat-lbl">LƯỢT KHÁM</div><div class="stat-val" style="color:var(--navy)">${pt.visits.length}</div><div class="stat-sub">${new Set(pt.visits.map(v=>v.bv)).size} bệnh viện</div></div>
+  <div class="stat"><div class="stat-lbl">XN CÒN HẠN</div><div class="stat-val" style="color:var(--greenM)">${validLabs.length}</div><div class="stat-sub">có thể dùng lại</div></div>
+  <div class="stat"><div class="stat-lbl">ẢNH CÒN HẠN</div><div class="stat-val" style="color:var(--purpM)">${validImg.length}</div><div class="stat-sub">PACS còn giá trị</div></div>
+  <div class="stat"><div class="stat-lbl">TIẾT KIỆM</div><div class="stat-val" style="color:var(--greenM)">${fmtCost(pt.savings.cost)}</div><div class="stat-sub">từ Smart Reuse</div></div>
+</div>
+<div class="g2" style="margin-bottom:16px">
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">📋 Chẩn đoán hiện tại</div>
+    ${pt.conditions.map(c=>`<div style="padding:7px 10px;background:var(--bg);border-radius:7px;margin-bottom:6px;font-size:12px;font-weight:500">• ${c}</div>`).join("")}
+    ${pt.allergies.length?`<div style="margin-top:8px;padding:8px 12px;background:var(--redL);border-radius:8px;font-size:11px;color:var(--redM);font-weight:700">⚠ Dị ứng: ${pt.allergies.join(", ")}</div>`:""}
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 8px">💊 Thuốc đang dùng</div>
+    ${pt.meds.map(m=>`<div style="font-size:11px;color:var(--g3);margin-bottom:3px">• ${m}</div>`).join("")}
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">🔒 Consent của tôi</div>
+    ${[["Tier 1","Cho phép bác sĩ BV khác xem để điều trị",true,false],["Tier 2","Dữ liệu ẩn danh cải thiện chất lượng",true,true],["Tier 3","Nghiên cứu khoa học / AI Training",false,true]].map(([t,d,on,editable])=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--g8)">
+      <div style="width:40px;height:24px;border-radius:12px;background:${on?"var(--tealM)":"var(--g8)"};position:relative;cursor:${editable?"pointer":"not-allowed"};flex-shrink:0">
+        <div style="width:18px;height:18px;border-radius:50%;background:white;position:absolute;top:3px;${on?"right:3px":"left:3px"};transition:all .2s"></div>
+      </div>
+      <div><div style="font-size:11px;font-weight:600">${t}</div><div style="font-size:10px;color:var(--g5)">${d}</div></div>
+      ${on?'<span class="tag-g" style="margin-left:auto">Bật</span>':'<span style="font-size:10px;color:var(--g5);margin-left:auto">Tắt</span>'}
+    </div>`).join("")}
+    <div style="margin-top:10px;padding:8px 12px;background:var(--navyL);border-radius:8px;font-size:10px;color:var(--navyM)">
+      Ai đã xem hồ sơ tôi gần đây: BS. Lê Thị Hoa (Vinmec) — 18/01/2024 · BS. Trần Minh Hùng (Bạch Mai) — 03/01/2024
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">📅 Lịch sử khám</div>
+  ${pt.visits.map(v=>`<div style="display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #F1F5F9;font-size:11px">
+    <span style="color:var(--g5);min-width:80px">${v.date}</span>
+    ${bdg(getBV(v.bv).short,"#1A4A8A")}
+    <span style="color:var(--g3)">${v.type}</span>
+    <span style="color:var(--g5)">${v.bs}</span>
+  </div>`).join("")}
+</div>
+</div>`;
+}
+
+function renderManagerDashboard(){
+  const bv=getBV(CURRENT_USER.bv)||BVS[0];
+  return `<div class="fadein">
+<div style="margin-bottom:20px">
+  <h2 style="font-size:20px;font-weight:800;color:var(--navy)">Dashboard Quản lý — ${bv.name}</h2>
+  <p style="font-size:12px;color:var(--g5)">Aggregate data only · Không có patient data cá nhân · ${CURRENT_USER.name}</p>
+</div>
+<div class="alert-r alert" style="margin-bottom:14px">🚫 Vai trò này KHÔNG xem được hồ sơ bệnh nhân cá nhân. Chỉ xem số liệu tổng hợp và quản lý kết nối.</div>
+<div class="g4" style="margin-bottom:16px">
+  <div class="stat"><div class="stat-lbl">DQ SCORE</div><div class="stat-val" style="color:${dqC(bv.dq)}">${bv.dq}%</div><div class="stat-sub">${bv.dq>=80?"✅ AI-ready":bv.dq>=60?"⚠ Cần cải thiện":"🔴 Chưa đạt"}</div></div>
+  <div class="stat"><div class="stat-lbl">CONNECTIONS</div><div class="stat-val" style="color:var(--greenM)">3/3</div><div class="stat-sub">HIS · LIS · PACS</div></div>
+  <div class="stat"><div class="stat-lbl">BN/THÁNG</div><div class="stat-val" style="color:var(--navy)">${Math.round(bv.patients/12).toLocaleString()}</div><div class="stat-sub">avg estimate</div></div>
+  <div class="stat"><div class="stat-lbl">UPTIME SIB</div><div class="stat-val" style="color:var(--greenM)">99.9%</div><div class="stat-sub">30 ngày qua</div></div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Adapter Status</div>
+    ${[["HIS Adapter","HL7v2","Online","#059669"],["LIS Adapter","HL7 v2.5 ORU","Online","#059669"],["PACS Adapter","DICOM 3.0","Online","#059669"],["FHIR Bridge","R4","Active","#059669"]].map(([n,t,s,c])=>`
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--g8);font-size:12px">
+      <span style="font-weight:600">${n}</span>
+      <span style="color:var(--g5)">${t}</span>
+      <span style="color:${c};font-weight:700">● ${s}</span>
+    </div>`).join("")}
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">DQ Breakdown</div>
+    ${[["ICD-10-VN mapping","73%"],["LOINC codes","58%"],["CCCD đầy đủ","91%"],["ATC thuốc","62%"],["Timestamp đầy đủ","88%"]].map(([l,v])=>{
+      const n=parseInt(v);
+      return `<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="color:var(--g3)">${l}</span><span style="color:${dqC(n)};font-weight:700">${v}</span></div>${prg(n,dqC(n),6)}</div>`;
+    }).join("")}
+  </div>
+</div>
+</div>`;
+}
+
+function renderResearcherDashboard(){
+  return `<div class="fadein">
+<div style="margin-bottom:20px">
+  <h2 style="font-size:20px;font-weight:800;color:var(--navy)">Research Portal — ${CURRENT_USER.name}</h2>
+  <p style="font-size:12px;color:var(--g5)">Federated Query only · De-identified aggregate data · IRB: ${CURRENT_USER.credential}</p>
+</div>
+<div class="alert-r alert" style="margin-bottom:14px">🚫 KHÔNG có quyền xem raw patient data. Chỉ được Federated Query cho kết quả aggregate, de-identified (Tier 2/3 consent).</div>
+<div class="g2">
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Federated Query Builder</div>
+    <div style="font-size:11px;font-weight:600;color:var(--g5);margin-bottom:5px">Query mẫu (de-identified)</div>
+    <pre style="font-size:11px;max-height:120px">${"SELECT COUNT(*), AVG(lab_value)\nFROM sib_federated\nWHERE condition_icd10 = 'E11'\n  AND age_group BETWEEN 50 AND 70\n  AND consent_tier >= 2\nGROUP BY bv_province\n-- NO PHI · AGGREGATE ONLY"}</pre>
+    <button onclick="simulateFederatedQuery()" class="btn-p" style="width:100%;margin-top:10px">▶ Chạy Federated Query</button>
+    <div id="fq-result"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">IRB Approval Status</div>
+    <div style="padding:10px 12px;background:var(--greenL);border-radius:8px;border:1px solid var(--greenM);margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--greenM)">✅ IRB-2024-055 — Approved</div>
+      <div style="font-size:10px;color:var(--green)">Hiệu lực: 01/2024 – 12/2024 · ĐH Y Hà Nội</div>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px">Data categories được phép</div>
+    ${["ĐTĐ type II (E11) — Tier 2","HbA1c values — aggregate","Tuổi/giới tính — de-identified","Kết quả điều trị — aggregate"].map(d=>`<div style="font-size:10px;color:var(--g3);margin-bottom:3px">✓ ${d}</div>`).join("")}
+    <div style="margin-top:10px;font-size:10px;color:var(--redM);font-weight:600">✗ Không được: tên, CCCD, địa chỉ, số điện thoại</div>
+  </div>
+</div>
+</div>`;
+}
+
+function simulateFederatedQuery(){
+  const el=document.getElementById('fq-result');
+  if(!el) return;
+  el.innerHTML='<div style="text-align:center;padding:10px"><div style="width:20px;height:20px;border:2px solid var(--g8);border-top-color:var(--tealM);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 6px"></div><div style="font-size:11px;color:var(--g5)">Querying 5 BV nodes...</div></div>';
+  setTimeout(()=>{
+    el.innerHTML=`<div style="margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:11px">
+      <div style="font-weight:700;color:var(--greenM);margin-bottom:5px">✅ Kết quả (de-identified aggregate)</div>
+      <table style="width:100%;font-size:10px;border-collapse:collapse">
+        <tr style="background:var(--g8)"><th style="padding:4px 6px;text-align:left">Tỉnh/thành</th><th style="padding:4px 6px">Số BN</th><th style="padding:4px 6px">HbA1c avg</th></tr>
+        ${[["Hà Nội","847","7.4%"],["TPHCM","623","7.8%"],["Đà Nẵng","198","7.2%"],["Cần Thơ","179","8.1%"]].map(r=>`<tr><td style="padding:4px 6px">${r[0]}</td><td style="padding:4px 6px;text-align:center">${r[1]}</td><td style="padding:4px 6px;text-align:center">${r[2]}</td></tr>`).join("")}
+      </table>
+      <div style="font-size:9px;color:var(--g5);margin-top:5px">1,847 BN phù hợp · Không có PHI · IRB-verified</div>
+    </div>`;
+  },1600);
+}
+
+function renderAdminDashboard(){
+  return `<div class="fadein">
+<div style="margin-bottom:20px">
+  <h2 style="font-size:20px;font-weight:800;color:var(--navy)">SIB Platform Monitor — HealthV Ops</h2>
+  <p style="font-size:12px;color:var(--g5)">${CURRENT_USER.name} · Infra monitoring only · Zero clinical data access</p>
+</div>
+<div class="alert-r alert" style="margin-bottom:14px">🛡️ SIB Admin tuyệt đối KHÔNG có quyền xem clinical data. Segregated infra access. Dual authorization required.</div>
+<div class="g5c" style="margin-bottom:16px">
+  ${[["Uptime","99.98%","#059669"],["API Latency","42ms","#059669"],["Active BVs","5/5","#059669"],["Errors/hr","0","#059669"],["FHIR Calls","12,847","#0B2D5E"]].map(([l,v,c])=>`<div class="stat"><div class="stat-lbl">${l}</div><div class="stat-val" style="color:${c};font-size:20px">${v}</div></div>`).join("")}
+</div>
+<div class="g2">
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">System Health</div>
+    ${BVS.filter(b=>b.status==="connected").map(b=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--g8);font-size:11px">
+      <span style="font-weight:600">${b.name}</span>
+      <div style="display:flex;gap:6px">
+        ${b.lisConnected?'<span style="color:#059669">LIS●</span>':'<span style="color:#94A3B8">LIS○</span>'}
+        ${b.pacsConnected?'<span style="color:#059669">PACS●</span>':'<span style="color:#94A3B8">PACS○</span>'}
+        <span style="color:#059669">HIS●</span>
+      </div>
+    </div>`).join("")}
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Recent System Events</div>
+    ${[["10:14:22","FHIR API: peak load 340 req/min","#059669"],["09:45:01","BV Bạch Mai: LIS sync completed","#059669"],["08:30:00","Daily DQ report generated","#059669"],["08:00:00","Scheduled backup completed","#059669"]].map(([t,m,c])=>`<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--g8);font-size:10px"><span style="color:var(--g5);min-width:55px">${t}</span><span style="color:${c}">${m}</span></div>`).join("")}
+    <div style="margin-top:10px;font-size:10px;color:var(--redM);font-weight:600">✗ Không có patient events — no clinical data</div>
+  </div>
+</div>
+</div>`;
+}
+
+
+// ══════════════════════════════════════════════════════════
+// DEMO DATA
+// ══════════════════════════════════════════════════════════
+const BVS = [
+  {id:"bv_a",name:"BV Bạch Mai",short:"BV Bạch Mai",vendor:"VNPT-IT HIS",type:"HL7v2",status:"connected",tier:1,city:"Hà Nội",patients:31000,dq:68,lisConnected:true,pacsConnected:true,beds:1900},
+  {id:"bv_b",name:"BV Vinmec Times City",short:"Vinmec TC",vendor:"Medisoft 5.2",type:"SQL",status:"connected",tier:1,city:"Hà Nội",patients:12400,dq:82,lisConnected:true,pacsConnected:true,beds:600},
+  {id:"bv_c",name:"BV FV Hospital",short:"FV",vendor:"Oracle Health Cerner",type:"FHIR",status:"connected",tier:1,city:"TPHCM",patients:8900,dq:96,lisConnected:true,pacsConnected:true,beds:220},
+  {id:"bv_d",name:"BV Thu Cúc",short:"Thu Cúc",vendor:"iSofH v3.1",type:"HL7v2",status:"connected",tier:2,city:"Hà Nội",patients:6700,dq:74,lisConnected:true,pacsConnected:false,beds:350},
+  {id:"bv_e",name:"BV Huyện Đan Phượng",short:"BV Huyện",vendor:"Phần mềm tự viết",type:"CSV",status:"partial",tier:3,city:"Hà Nội",patients:2100,dq:41,lisConnected:false,pacsConnected:false,beds:90},
+];
+
+const PATIENTS = [
+  {
+    id:"SIB-2024-001",name:"Nguyễn Văn An",dob:"1965-03-15",cccd:"001065012345",bhyt:"SB4010000123456",
+    sex:"Nam",phone:"0901234567",bvGoc:"bv_a",
+    visits:[
+      {bv:"bv_a",date:"2024-01-03",type:"Khám nội tiết",bs:"BS. Trần Minh Hùng"},
+      {bv:"bv_b",date:"2024-01-18",type:"Tái khám chuyên khoa",bs:"BS. Lê Thị Hoa"},
+      {bv:"bv_a",date:"2024-02-05",type:"Tái khám định kỳ",bs:"BS. Trần Minh Hùng"},
+    ],
+    conditions:["Đái tháo đường type II (E11.9)","Tăng huyết áp (I10)"],
+    meds:["Metformin 500mg × 2/ngày","Amlodipine 5mg × 1/ngày","Aspirin 81mg × 1/ngày"],
+    allergies:[],
+    labs:[
+      {id:"L001",name:"Công thức máu (CBC)",date:"2024-01-03",bv:"bv_a",loinc:"58410-2",result:"Bình thường",wbc:6.8,hgb:13.4,plt:210,validity:7,unit:"ngày",status:"valid",daysAgo:17},
+      {id:"L002",name:"Đường huyết lúc đói (FPG)",date:"2024-01-03",bv:"bv_a",loinc:"1558-6",result:"8.4 mmol/L",value:8.4,ref:"3.9–5.6",validity:2,unit:"ngày",status:"expired",daysAgo:17},
+      {id:"L003",name:"HbA1c",date:"2024-01-03",bv:"bv_a",loinc:"4548-4",result:"7.8%",value:7.8,ref:"<7.0%",validity:90,unit:"ngày",status:"valid",daysAgo:17},
+      {id:"L004",name:"Lipid profile",date:"2024-01-03",bv:"bv_a",loinc:"57698-3",result:"LDL 3.2 mmol/L",value:3.2,ref:"<2.6",validity:30,unit:"ngày",status:"valid",daysAgo:17},
+      {id:"L005",name:"Creatinine / eGFR",date:"2024-01-03",bv:"bv_a",loinc:"33914-3",result:"eGFR 78 mL/min",value:78,ref:">60",validity:30,unit:"ngày",status:"valid",daysAgo:17},
+      {id:"L006",name:"AST / ALT",date:"2024-01-03",bv:"bv_a",loinc:"1742-6",result:"Bình thường",validity:30,unit:"ngày",status:"valid",daysAgo:17},
+    ],
+    imaging:[
+      {id:"I001",name:"X-quang ngực thẳng",date:"2024-01-03",bv:"bv_a",modality:"CR",finding:"Không tổn thương thực thể. Tim và phổi bình thường.",validity:30,unit:"ngày",status:"valid",daysAgo:17,size:"2.4 MB"},
+      {id:"I002",name:"Siêu âm bụng",date:"2023-11-20",bv:"bv_a",modality:"US",finding:"Gan, mật, tụy, thận: bình thường. Không dịch tự do.",validity:90,unit:"ngày",status:"valid",daysAgo:62,size:"18 MB"},
+      {id:"I003",name:"ECG",date:"2024-01-03",bv:"bv_a",modality:"ECG",finding:"Nhịp xoang đều. Không có bất thường.",validity:7,unit:"ngày",status:"expired",daysAgo:17,size:"0.1 MB"},
+    ],
+    consentTier:1,
+    savings:{cost:3500000,time:4.5,radiation:true}
+  },
+  {
+    id:"SIB-2024-002",name:"Trần Thị Bình",dob:"1978-07-22",cccd:"038078034567",bhyt:"SB4020000234567",
+    sex:"Nữ",phone:"0912345678",bvGoc:"bv_b",
+    visits:[
+      {bv:"bv_b",date:"2024-01-10",type:"Khám tiêu hóa",bs:"BS. Nguyễn Hoàng Nam"},
+      {bv:"bv_c",date:"2024-01-20",type:"Khám chuyên sâu",bs:"BS. Phạm Thu Trang"},
+    ],
+    conditions:["Viêm gan B mạn (B18.1)"],
+    meds:["Tenofovir 300mg × 1/ngày"],
+    allergies:["Penicillin — phát ban"],
+    labs:[
+      {id:"L007",name:"HBsAg / HBV DNA",date:"2024-01-10",bv:"bv_b",loinc:"5009-6",result:"HBsAg (+), DNA 2,400 IU/mL",validity:90,unit:"ngày",status:"valid",daysAgo:10},
+      {id:"L008",name:"Công thức máu (CBC)",date:"2024-01-10",bv:"bv_b",loinc:"58410-2",result:"Bình thường",validity:7,unit:"ngày",status:"valid",daysAgo:10},
+      {id:"L009",name:"AST / ALT / GGT",date:"2024-01-10",bv:"bv_b",loinc:"1742-6",result:"ALT 52 U/L (↑)",validity:14,unit:"ngày",status:"valid",daysAgo:10},
+    ],
+    imaging:[
+      {id:"I004",name:"Siêu âm bụng gan mật",date:"2024-01-10",bv:"bv_b",modality:"US",finding:"Gan to nhẹ, tăng âm nhẹ. Không có khối. Không dịch.",validity:90,unit:"ngày",status:"valid",daysAgo:10,size:"22 MB"},
+    ],
+    consentTier:1,
+    savings:{cost:1800000,time:2.5,radiation:false}
+  },
+  {
+    id:"SIB-2024-003",name:"Phạm Thị Dung",dob:"1955-04-30",cccd:"027055078901",bhyt:"SB4030000345678",
+    sex:"Nữ",phone:"0923456789",bvGoc:"bv_a",
+    visits:[
+      {bv:"bv_a",date:"2023-12-15",type:"Khám tim mạch",bs:"BS. Vũ Đình Khoa"},
+      {bv:"bv_d",date:"2024-01-05",type:"Cấp cứu khó thở",bs:"BS. Lê Văn Toàn"},
+      {bv:"bv_b",date:"2024-01-15",type:"Tái khám chuyên khoa",bs:"BS. Nguyễn Thị Mai"},
+    ],
+    conditions:["COPD (J44.1)","Tăng huyết áp (I10)","Suy tim phân suất tống máu giảm (I50.20)"],
+    meds:["Tiotropium 18mcg/ngày","Bisoprolol 5mg × 1/ngày","Furosemide 40mg × 1/ngày","Ramipril 5mg × 1/ngày"],
+    allergies:["Aspirin — co thắt phế quản"],
+    labs:[
+      {id:"L010",name:"BNP/NT-proBNP",date:"2024-01-05",bv:"bv_d",loinc:"33762-6",result:"NT-proBNP 1,840 pg/mL (↑)",validity:14,unit:"ngày",status:"valid",daysAgo:15},
+      {id:"L011",name:"Công thức máu",date:"2024-01-05",bv:"bv_d",loinc:"58410-2",result:"Hct 38%, Hgb 12.1g/dL",validity:7,unit:"ngày",status:"expired",daysAgo:15},
+      {id:"L012",name:"Điện giải đồ",date:"2024-01-05",bv:"bv_d",loinc:"24326-1",result:"K 3.8, Na 138 mmol/L",validity:3,unit:"ngày",status:"expired",daysAgo:15},
+      {id:"L013",name:"Troponin I",date:"2024-01-05",bv:"bv_d",loinc:"10839-9",result:"<0.01 ng/mL (bình thường)",validity:1,unit:"ngày",status:"expired",daysAgo:15},
+      {id:"L014",name:"Creatinine / eGFR",date:"2024-01-05",bv:"bv_d",loinc:"33914-3",result:"eGFR 62 mL/min",validity:14,unit:"ngày",status:"valid",daysAgo:15},
+    ],
+    imaging:[
+      {id:"I005",name:"X-quang ngực thẳng",date:"2024-01-05",bv:"bv_d",modality:"CR",finding:"Tim to (CTR 0.56). Phổi sung huyết nhẹ. Không tràn khí.",validity:30,unit:"ngày",status:"valid",daysAgo:15,size:"3.1 MB"},
+      {id:"I006",name:"Siêu âm tim (Echo)",date:"2023-12-15",bv:"bv_a",modality:"US",finding:"EF 38%. Giảm động vùng. Hở van 2 lá nhẹ.",validity:90,unit:"ngày",status:"valid",daysAgo:36,size:"45 MB"},
+      {id:"I007",name:"CT ngực",date:"2023-11-01",bv:"bv_a",modality:"CT",finding:"COPD nặng. Emphysema lan tỏa. Không khối.",validity:180,unit:"ngày",status:"valid",daysAgo:80,size:"180 MB"},
+    ],
+    consentTier:2,
+    savings:{cost:5200000,time:6.5,radiation:true}
+  },
+];
+
+const REUSE_RULES = {
+  "CBC":{name:"Công thức máu (CBC)",days:7,condition:"Bệnh nhân ổn định, không sốt, không chảy máu",redo:"Sốt mới, chảy máu, hóa trị"},
+  "FPG":{name:"Đường huyết lúc đói",days:2,condition:"Không thay đổi tình trạng lâm sàng",redo:"Nghi ngờ hạ/tăng đường huyết cấp"},
+  "HbA1c":{name:"HbA1c",days:90,condition:"Bệnh nhân ĐTĐ ổn định",redo:"Thay đổi phác đồ insulin"},
+  "Lipid":{name:"Lipid profile",days:30,condition:"Không thay đổi thuốc statin",redo:"Bắt đầu/thay đổi statin"},
+  "CXR":{name:"X-quang ngực",days:30,condition:"Không triệu chứng hô hấp mới",redo:"Ho ra máu, khó thở mới"},
+  "CT":{name:"CT scan",days:90,condition:"Bệnh mạn tính ổn định, theo dõi",redo:"Triệu chứng mới, staging ung thư"},
+  "Echo":{name:"Siêu âm tim",days:90,condition:"Không triệu chứng tim mạch mới",redo:"Suy tim mất bù, đau ngực"},
+  "ECG":{name:"Điện tâm đồ",days:7,condition:"Không đau ngực, không loạn nhịp mới",redo:"Đau ngực cấp, khó thở"},
+};
+
+// ══════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════════════════════
+let S={
+  tab:"dashboard",
+  selectedPt:null,
+  selectedBV:null,
+  reuseQuery:{cccd:"",bv:""},
+  reuseResult:null,
+  reuseLoading:false,
+  totalSaved:{cost:0,time:0,xn:0},
+  syncLog:[],
+};
+
+// Aggregate savings
+S.totalSaved.cost = PATIENTS.reduce((a,p)=>a+p.savings.cost,0);
+S.totalSaved.time = PATIENTS.reduce((a,p)=>a+p.savings.time,0);
+S.totalSaved.xn   = PATIENTS.reduce((a,p)=>a+p.labs.filter(l=>l.status==="valid").length+p.imaging.filter(i=>i.status==="valid").length,0);
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function dqC(s){return s>=80?"#059669":s>=60?"#D97706":s>=40?"#EA580C":"#DC2626"}
+function statusC(s){return s==="connected"?"#059669":s==="partial"?"#D97706":"#94A3B8"}
+function getBV(id){return BVS.find(b=>b.id===id)||{name:"Không xác định",short:"N/A"}}
+function getPt(id){return PATIENTS.find(p=>p.id===id)}
+function fmtCost(n){return (n/1000000).toFixed(1)+"M VND"}
+function validTag(status){
+  return status==="valid"
+    ?`<span class="tag-g">✓ Còn hạn</span>`
+    :`<span class="tag-r">✗ Hết hạn</span>`;
+}
+function daysLeft(rule,daysAgo){return rule-daysAgo}
+function prg(val,col,h=7){return `<div class="prog" style="height:${h}px"><div class="prog-fill" style="width:${Math.min(100,Math.max(0,val))}%;background:${col}"></div></div>`}
+function bdg(l,c){return `<span class="badge" style="color:${c};background:${c}18;border:1px solid ${c}40">${l}</span>`}
+
+// ══════════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════════
+const TABS=[
+  {id:"dashboard",label:"📊 Dashboard"},
+  {id:"patients",label:"👤 Patient MPI"},
+  {id:"reuse",label:"⚡ Smart Reuse"},
+  {id:"lis",label:"🧪 LIS Results"},
+  {id:"pacs",label:"🩻 PACS Imaging"},
+  {id:"portal",label:"🏠 Patient Portal"},
+  {id:"security",label:"🔒 Security"},
+  {id:"rbac",label:"👥 RBAC & Roles"},
+  {id:"roi",label:"💰 ROI & Đầu tư"},
+];
+function initTabs(){
+  if(CURRENT_USER){
+    // Role-aware tabs already set by initAppForRole
+    return;
+  }
+  document.getElementById('tabs-row').innerHTML=
+    TABS.map(t=>`<button class="tab${S.tab===t.id?" active":""}" onclick="switchTab('${t.id}')">${t.label}</button>`).join('');
+}
+function switchTab(id){
+  S.tab=id;
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  initTabs();
+  renderPane(id);
+}
+function renderPane(id){
+  const el=document.getElementById('pane-'+id);
+  const fn={dashboard:renderDashboard,patients:renderPatients,reuse:renderReuse,lis:renderLIS,pacs:renderPACS,portal:renderPortal,security:renderSecurity,rbac:renderRBAC,roi:renderROI};
+  if(fn[id]) el.innerHTML=fn[id]();
+  attachEvents(id);
+}
+
+// ══════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════
+function renderDashboard(){
+  const connected=BVS.filter(b=>b.status==="connected");
+  const totalPts=connected.reduce((a,b)=>a+b.patients,0);
+  const avgDQ=Math.round(connected.reduce((a,b)=>a+b.dq,0)/connected.length);
+  return `<div class="fadein">
+<div style="margin-bottom:20px">
+  <h2 style="font-size:20px;font-weight:800;color:var(--navy);margin-bottom:3px">SIB Dashboard</h2>
+  <p style="font-size:12px;color:var(--g5)">HIS · LIS · PACS Interconnection Bridge · Lấy người bệnh làm trung tâm · Demo data Q1/2026</p>
+</div>
+
+<!-- Stats -->
+<div class="g5c" style="margin-bottom:20px">
+  <div class="stat"><div class="stat-lbl">BV ĐÃ KẾT NỐI</div><div class="stat-val" style="color:var(--greenM)">${connected.length}</div><div class="stat-sub">/ ${BVS.length} tổng</div></div>
+  <div class="stat"><div class="stat-lbl">PATIENT RECORDS</div><div class="stat-val" style="color:var(--navy)">${totalPts.toLocaleString()}</div><div class="stat-sub">đã FHIR hóa</div></div>
+  <div class="stat"><div class="stat-lbl">AVG DQ SCORE</div><div class="stat-val" style="color:var(--goldM)">${avgDQ}%</div><div class="stat-sub">Data Quality</div></div>
+  <div class="stat"><div class="stat-lbl">TIẾT KIỆM DEMO</div><div class="stat-val" style="color:var(--greenM)">${fmtCost(S.totalSaved.cost)}</div><div class="stat-sub">${PATIENTS.length} BN mẫu</div></div>
+  <div class="stat"><div class="stat-lbl">XN/CHỤP TRÁNH</div><div class="stat-val" style="color:var(--purpM)">${S.totalSaved.xn}</div><div class="stat-sub">còn giá trị lâm sàng</div></div>
+</div>
+
+<div class="g2" style="margin-bottom:16px">
+<!-- BV connections -->
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--navy)">Trạng thái kết nối BV</div>
+    <button class="btn-s" onclick="showConnectModal()">+ Kết nối BV mới</button>
+  </div>
+  ${BVS.map(b=>`
+  <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F1F5F9;cursor:pointer" onclick="switchTab('patients')">
+    <span class="sdot" style="background:${statusC(b.status)}"></span>
+    <div style="flex:1">
+      <div style="font-size:12px;font-weight:600">${b.name}</div>
+      <div style="font-size:10px;color:var(--g5)">${b.vendor} · ${b.city} · Tuyến ${b.tier}</div>
+    </div>
+    <div style="display:flex;gap:4px">
+      ${bdg("HIS","#0B2D5E")} ${b.lisConnected?bdg("LIS","#059669"):'<span style="font-size:9px;color:var(--g5)">LIS-</span>'} ${b.pacsConnected?bdg("PACS","#7C3AED"):'<span style="font-size:9px;color:var(--g5)">PACS-</span>'}
+    </div>
+    <div style="min-width:80px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span style="color:var(--g5)">DQ</span><span style="color:${dqC(b.dq)};font-weight:700">${b.dq}%</span></div>
+      ${prg(b.dq,dqC(b.dq),6)}
+    </div>
+    <div style="font-size:10px;color:var(--g5);min-width:55px;text-align:right">${b.patients>0?b.patients.toLocaleString()+" pts":"—"}</div>
+  </div>`).join('')}
+</div>
+
+<!-- Value panel -->
+<div style="display:flex;flex-direction:column;gap:12px">
+  <div class="card" style="flex:1">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">🎯 Giá trị cốt lõi SIB</div>
+    ${[
+      ["⏱","Tránh XN trùng lặp","Bác sĩ thấy kết quả còn hạn → không cần làm lại","var(--greenM)"],
+      ["🩻","Tránh chụp chiếu lại","X-quang/CT/MRI còn giá trị được tái sử dụng","var(--greenM)"],
+      ["📋","Kế thừa hồ sơ","Bác sĩ BV B thấy đầy đủ lịch sử từ BV A","var(--tealM)"],
+      ["🔄","Đồng bộ về BV gốc","BV A tự nhận kết quả từ BV B về hồ sơ gốc","var(--blueM)"],
+      ["👤","Patient Portal","BN tự xem hồ sơ, kết quả từ mọi BV","var(--purpM)"],
+    ].map(([ic,t,d,c])=>`
+    <div style="display:flex;gap:8px;margin-bottom:9px;align-items:flex-start">
+      <span style="font-size:16px;flex-shrink:0">${ic}</span>
+      <div><div style="font-size:11px;font-weight:700;color:${c}">${t}</div><div style="font-size:10px;color:var(--g3)">${d}</div></div>
+    </div>`).join('')}
+  </div>
+  <div class="card" style="background:var(--navyL);border-color:var(--navyM)">
+    <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">🤖 AI Products trên SIB</div>
+    ${["🔍 EvalAIH — Kiểm chứng AI output","🎙️ Ambient Scribe VN — Ghi chú lâm sàng","🩺 Telemedicine Agent — Chăm sóc mạn tính","📡 AI.DFS — Dự báo dịch bệnh"].map(p=>`<div style="font-size:11px;color:var(--navyM);margin-bottom:4px;font-weight:500">✓ ${p}</div>`).join('')}
+  </div>
+</div>
+</div>
+
+<!-- Architecture flow -->
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px">Kiến trúc SIB 5 Tầng — Luồng dữ liệu HIS + LIS + PACS</div>
+  <div style="display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px">
+    <div style="display:flex;flex-direction:column;gap:5px;min-width:120px">
+      ${["HIS (SQL/HL7v2)","LIS (HL7 v2.5 ORU)","PACS (DICOM)"].map((s,i)=>`<div style="padding:7px 10px;background:${["#7C3AED","#059669","#0EA5E9"][i]}18;border:1.5px solid ${["#7C3AED","#059669","#0EA5E9"][i]}60;border-radius:8px;font-size:10px;font-weight:600;color:${["#7C3AED","#059669","#0EA5E9"][i]};text-align:center">${s}</div>`).join('')}
+    </div>
+    <div style="display:flex;align-items:center;padding:0 10px;font-size:20px;color:var(--g8);flex-shrink:0">→</div>
+    <div style="background:var(--purpL);border:2px solid var(--purpM);border-radius:10px;padding:10px 14px;min-width:130px;text-align:center;flex-shrink:0">
+      <div style="font-size:11px;font-weight:700;color:var(--purpM);margin-bottom:5px">T1 · Adapters</div>
+      <div style="font-size:9px;color:var(--purpM)">Read-only · on-premise · mTLS</div>
+    </div>
+    <div style="display:flex;align-items:center;padding:0 10px;font-size:20px;color:var(--g8);flex-shrink:0">→</div>
+    <div style="background:var(--navyL);border:2px solid var(--navy);border-radius:10px;padding:10px 14px;min-width:200px;flex-shrink:0">
+      <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:5px">T2·T3·T4 · Bridge Core</div>
+      ${["T2 FHIR R4 Normalizer","T3 MPI + Clinical Index","T4 Smart Reuse Engine","T5 Bidirectional Sync"].map(c=>`<div style="font-size:9px;color:var(--g3);margin-bottom:2px">• ${c}</div>`).join('')}
+    </div>
+    <div style="display:flex;align-items:center;padding:0 10px;font-size:20px;color:var(--g8);flex-shrink:0">→</div>
+    <div style="background:var(--tealL);border:2px solid var(--tealM);border-radius:10px;padding:10px 14px;min-width:130px;text-align:center;flex-shrink:0">
+      <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:5px">T5 · API Gateway</div>
+      <div style="font-size:9px;color:var(--teal)">FHIR R4 · SMART OAuth2 · WORM Audit</div>
+    </div>
+    <div style="display:flex;align-items:center;padding:0 10px;font-size:20px;color:var(--g8);flex-shrink:0">→</div>
+    <div style="display:flex;flex-direction:column;gap:4px;min-width:120px">
+      ${["BS tại BV B","Patient Portal","EvalAIH AI","Nghiên cứu viên"].map((s,i)=>`<div style="padding:5px 10px;background:var(--greenL);border:1px solid #05986960;border-radius:6px;font-size:9px;font-weight:600;color:var(--green)">${s}</div>`).join('')}
+    </div>
+  </div>
+</div>
+</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// PATIENT MPI
+// ══════════════════════════════════════════════════════════
+function renderPatients(){
+  const pt=S.selectedPt?getPt(S.selectedPt):null;
+  return `<div class="fadein">
+<div style="margin-bottom:18px">
+  <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">Master Patient Index (MPI)</h2>
+  <p style="font-size:12px;color:var(--g5)">Định danh bệnh nhân duy nhất · Tổng hợp từ HIS + LIS + PACS mọi BV · Đồng bộ 2 chiều</p>
+</div>
+<div class="g2">
+<!-- Patient list -->
+<div>
+  ${PATIENTS.map(p=>{
+    const bvG=getBV(p.bvGoc);
+    const validLabs=p.labs.filter(l=>l.status==="valid").length;
+    const validImaging=p.imaging.filter(i=>i.status==="valid").length;
+    const isSel=S.selectedPt===p.id;
+    return `
+    <div style="margin-bottom:10px;cursor:pointer" onclick="selectPt('${p.id}')">
+      <div class="card" style="border-color:${isSel?"var(--tealM)":"var(--g8)"};border-width:${isSel?2:1}px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;border-radius:50%;background:var(--navyL);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${p.sex==="Nam"?"👨":"👩"}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700">${p.name}</div>
+            <div style="font-size:10px;color:var(--g5)">CCCD: ${p.cccd} · ${p.dob} · ${p.sex}</div>
+            <div style="font-size:10px;color:var(--g5)">BHYT: ${p.bhyt} · BV gốc: ${bvG.short}</div>
+            <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap">
+              ${p.visits.map(v=>getBV(v.bv)).filter((b,i,a)=>a.findIndex(x=>x.id===b.id)===i).map(b=>bdg(b.short,"#1A4A8A")).join(" ")}
+              <span class="tag-g">${validLabs} XN còn hạn</span>
+              <span class="tag-b">${validImaging} ảnh còn hạn</span>
+              ${p.allergies.length?'<span class="tag-r">⚠ Allergy</span>':""}
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--tealM)">${isSel?"▲":"▼"}</div>
+        </div>
+      </div>
+      ${isSel?`
+      <div style="background:#F8FAFC;border:2px solid var(--tealM);border-top:none;border-radius:0 0 10px 10px;padding:14px">
+        <div class="g2" style="margin-bottom:10px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:5px">Chẩn đoán (ICD-10-VN)</div>
+            ${p.conditions.map(c=>`<div style="font-size:10px;color:var(--greenM);margin-bottom:3px;font-weight:500">• ${c}</div>`).join("")}
+            ${p.allergies.length?`<div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--redM)">Dị ứng:</div>${p.allergies.map(a=>`<div style="font-size:10px;color:var(--redM)">⚠ ${a}</div>`).join("")}`:""}
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:5px">Thuốc (ATC code)</div>
+            ${p.meds.map(m=>`<div style="font-size:10px;color:var(--g3);margin-bottom:3px">• ${m}</div>`).join("")}
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">Lịch sử khám (${p.visits.length} lần tại ${new Set(p.visits.map(v=>v.bv)).size} BV)</div>
+        ${p.visits.map(v=>{
+          const b=getBV(v.bv);
+          return `<div style="display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid #F1F5F9;font-size:10px">
+            <span style="color:var(--g5);min-width:70px">${v.date}</span>
+            ${bdg(b.short,"#1A4A8A")}
+            <span style="color:var(--g3)">${v.type}</span>
+            <span style="color:var(--g5)">${v.bs}</span>
+          </div>`;
+        }).join("")}
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn-s" onclick="switchTab('reuse');setReusePatient('${p.id}')">⚡ Smart Reuse Check</button>
+          <button class="btn-s" onclick="switchTab('lis')">🧪 Xem kết quả XN</button>
+          <button class="btn-s" onclick="switchTab('pacs')">🩻 Xem ảnh PACS</button>
+        </div>
+      </div>`:""}`;}
+  ).join("")}
+</div>
+
+<!-- FHIR preview -->
+<div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">FHIR R4 Patient Resource</div>
+    ${pt?`
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
+      ${bdg("200 OK","#059669")} ${bdg("GET /fhir/r4/Patient/"+pt.id,"#0B2D5E")} ${bdg("HL7 FHIR R4","#7C3AED")}
+    </div>
+    <pre>${JSON.stringify({
+      resourceType:"Patient",id:pt.id,
+      meta:{lastUpdated:new Date().toISOString(),source:"SIB v1.0",
+        tag:[{system:"https://healthv.vn/bv-source",code:pt.bvGoc}]},
+      identifier:[
+        {system:"https://healthv.vn/mpi",value:pt.id},
+        {system:"https://id.gov.vn/cccd",value:pt.cccd},
+        {system:"https://baohiemxahoi.gov.vn/bhyt",value:pt.bhyt},
+      ],
+      name:[{use:"official",family:pt.name.split(" ").slice(-1)[0],given:pt.name.split(" ").slice(0,-1)}],
+      birthDate:pt.dob,gender:pt.sex==="Nam"?"male":"female",
+      address:[{country:"VN"}],
+      extension:[{url:"https://healthv.vn/fhir/ext/consent-tier",valueInteger:pt.consentTier}],
+    },null,2)}</pre>`:
+    `<div style="text-align:center;padding:40px 0;color:var(--g5)">
+      <div style="font-size:28px;margin-bottom:8px">📋</div>
+      <p style="font-size:12px">Chọn bệnh nhân để xem FHIR R4 resource</p>
+    </div>`}
+  </div>
+  ${pt?`
+  <div class="card" style="background:var(--tealL);border-color:var(--tealM)">
+    <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:8px">💰 Tiết kiệm cho BN này</div>
+    <div class="g3">
+      <div class="stat" style="background:white"><div class="stat-lbl">CHI PHÍ TIẾT KIỆM</div><div class="stat-val" style="font-size:18px;color:var(--greenM)">${fmtCost(pt.savings.cost)}</div></div>
+      <div class="stat" style="background:white"><div class="stat-lbl">THỜI GIAN</div><div class="stat-val" style="font-size:18px;color:var(--blueM)">${pt.savings.time}h</div></div>
+      <div class="stat" style="background:white"><div class="stat-lbl">PHƠI XẠ</div><div class="stat-val" style="font-size:18px;color:${pt.savings.radiation?"#059669":"#94A3B8"}">${pt.savings.radiation?"Tránh được":"N/A"}</div></div>
+    </div>
+  </div>`:""}
+</div>
+</div>
+</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// SMART REUSE ENGINE
+// ══════════════════════════════════════════════════════════
+function renderReuse(){
+  const pt=S.reuseResult?S.reuseResult:null;
+  return `<div class="fadein">
+<div style="margin-bottom:18px">
+  <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">⚡ Smart Reuse Engine</h2>
+  <p style="font-size:12px;color:var(--g5)">Kiểm tra kết quả XN/chụp chiếu còn giá trị lâm sàng · Tránh làm lại không cần thiết · Quyết định cuối thuộc về bác sĩ</p>
+</div>
+
+<!-- Search panel -->
+<div class="card" style="margin-bottom:16px">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px">Tra cứu bệnh nhân — Bác sĩ tại BV B nhập</div>
+  <div class="g2" style="margin-bottom:12px">
+    <div>
+      <label>CCCD / BHYT bệnh nhân</label>
+      <input type="text" id="reuse-cccd" placeholder="VD: 001065012345 hoặc SB4010000123456" value="${S.reuseQuery.cccd}">
+    </div>
+    <div>
+      <label>Chọn nhanh bệnh nhân demo</label>
+      <select id="reuse-pt-select" onchange="quickSelectPt(this.value)">
+        <option value="">-- Chọn bệnh nhân --</option>
+        ${PATIENTS.map(p=>`<option value="${p.cccd}">${p.name} (${p.cccd})</option>`).join("")}
+      </select>
+    </div>
+  </div>
+  <div class="g2" style="margin-bottom:12px">
+    <div>
+      <label>BV B đang tra cứu (BV của bác sĩ)</label>
+      <select id="reuse-bv">
+        ${BVS.filter(b=>b.status==="connected").map(b=>`<option value="${b.id}">${b.name}</option>`).join("")}
+      </select>
+    </div>
+    <div>
+      <label>Lý do khám (tùy chọn)</label>
+      <input type="text" id="reuse-reason" placeholder="VD: Tái khám nội tiết, đau ngực...">
+    </div>
+  </div>
+  <button class="btn-p" id="reuse-btn" onclick="runReuse()">⚡ Kiểm tra Smart Reuse</button>
+</div>
+
+<!-- Results -->
+${S.reuseLoading?`
+<div class="card" style="text-align:center;padding:60px">
+  <div style="width:40px;height:40px;border:4px solid var(--g8);border-top-color:var(--tealM);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px"></div>
+  <p style="font-size:14px;font-weight:600;color:var(--navy)">Smart Reuse Engine đang phân tích...</p>
+  <p style="font-size:11px;color:var(--g5);margin-top:6px">Truy vấn SIB · Kiểm tra validity · Phân loại kết quả</p>
+</div>`:pt?renderReuseResult(pt):`
+<div class="card" style="text-align:center;padding:60px">
+  <div style="font-size:40px;margin-bottom:12px">⚡</div>
+  <p style="font-size:13px;color:var(--g3);margin-bottom:6px">Nhập CCCD/BHYT bệnh nhân và nhấn Kiểm tra</p>
+  <p style="font-size:11px;color:var(--g5)">Engine sẽ tự động tìm kết quả XN và ảnh từ mọi BV đã kết nối</p>
+</div>`}
+</div>`;
+}
+
+function renderReuseResult(pt){
+  const validLabs=pt.labs.filter(l=>l.status==="valid");
+  const expiredLabs=pt.labs.filter(l=>l.status==="expired");
+  const validImg=pt.imaging.filter(i=>i.status==="valid");
+  const expiredImg=pt.imaging.filter(i=>i.status==="expired");
+  const savings = (validLabs.length+validImg.length)*350000;
+  return `
+<div class="alert-g alert">✅ Tìm thấy hồ sơ bệnh nhân: <strong>${pt.name}</strong> · CCCD: ${pt.cccd} · BV gốc: ${getBV(pt.bvGoc).name} · SIB ID: ${pt.id}</div>
+${pt.allergies.length?`<div class="alert-r alert">⚠ CẢNH BÁO DỊ ỨNG: ${pt.allergies.join(", ")}</div>`:""}
+<div class="alert-b alert">ℹ Consent Tier ${pt.consentTier}/3: Bệnh nhân đã đồng ý chia sẻ data cho mục đích điều trị (Tier 1). Đọc kết quả này phù hợp.</div>
+
+<div class="g2" style="margin-bottom:14px">
+<div class="card" style="border-color:var(--greenM);border-width:2px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;color:var(--greenM)">✅ Kết quả XN còn giá trị — CÓ THỂ DÙNG LẠI</div>
+    <span class="tag-g">${validLabs.length} mục</span>
+  </div>
+  ${validLabs.map(l=>{
+    const remain=daysLeft(l.validity,l.daysAgo);
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--g8)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+        <div>
+          <span style="font-size:12px;font-weight:600">${l.name}</span>
+          <span style="font-size:10px;color:var(--g5);margin-left:6px">LOINC: ${l.loinc}</span>
+        </div>
+        <span class="tag-g">Còn ${remain} ngày</span>
+      </div>
+      <div style="display:flex;gap:10px;font-size:11px;color:var(--g3)">
+        <span>📅 ${l.date} tại ${getBV(l.bv).short}</span>
+        <span style="font-weight:600;color:var(--greenM)">Kết quả: ${l.result}</span>
+      </div>
+    </div>`;
+  }).join("")}
+  <div style="margin-top:10px;padding:8px 12px;background:var(--greenL);border-radius:8px;font-size:11px;color:var(--green);font-weight:500">
+    💡 Tiết kiệm ước tính: ~${fmtCost(savings)} và ~${(validLabs.length+validImg.length)*0.5}h chờ đợi nếu không làm lại các kết quả này
+  </div>
+</div>
+<div class="card" style="border-color:var(--redM);border-width:2px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;color:var(--redM)">🔄 Kết quả đã hết hạn — CẦN LÀM LẠI</div>
+    <span class="tag-r">${expiredLabs.length+expiredImg.length} mục</span>
+  </div>
+  ${[...expiredLabs,...expiredImg].map(l=>`
+  <div style="padding:8px 0;border-bottom:1px solid var(--g8)">
+    <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+      <span style="font-size:12px;font-weight:600">${l.name}</span>
+      <span class="tag-r">Hết hạn ${l.daysAgo-l.validity} ngày trước</span>
+    </div>
+    <div style="font-size:11px;color:var(--g5)">📅 ${l.date} tại ${getBV(l.bv).short} · Hiệu lực: ${l.validity} ${l.unit}</div>
+  </div>`).join("")}
+</div>
+</div>
+
+<!-- Imaging valid -->
+${validImg.length?`
+<div class="card" style="margin-bottom:14px;border-color:var(--purpM);border-width:2px">
+  <div style="font-size:13px;font-weight:700;color:var(--purpM);margin-bottom:12px">🩻 Ảnh chẩn đoán còn giá trị</div>
+  <table class="data-table">
+    <thead><tr><th>Loại chụp chiếu</th><th>Ngày chụp</th><th>BV</th><th>Kết quả</th><th>Còn hạn</th><th>Kích thước</th></tr></thead>
+    <tbody>
+    ${validImg.map(i=>`<tr>
+      <td><strong>${i.name}</strong><br><span style="font-size:10px;color:var(--g5)">${i.modality}</span></td>
+      <td>${i.date}</td><td>${getBV(i.bv).short}</td>
+      <td style="font-size:11px">${i.finding.slice(0,60)}...</td>
+      <td><span class="tag-g">Còn ${daysLeft(i.validity,i.daysAgo)} ngày</span></td>
+      <td style="font-size:11px;color:var(--g5)">${i.size}</td>
+    </tr>`).join("")}
+    </tbody>
+  </table>
+</div>`:""}`;}
+
+// ══════════════════════════════════════════════════════════
+// LIS
+// ══════════════════════════════════════════════════════════
+function renderLIS(){
+  const pt=S.selectedPt?getPt(S.selectedPt):PATIENTS[0];
+  return `<div class="fadein">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+  <div>
+    <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">🧪 LIS — Kết quả Xét nghiệm</h2>
+    <p style="font-size:12px;color:var(--g5)">Laboratory Information System · HL7 v2.5 ORU · LOINC codes · Smart Reuse validity</p>
+  </div>
+  <select onchange="selectLISPt(this.value)" style="width:220px">
+    ${PATIENTS.map(p=>`<option value="${p.id}"${(pt&&pt.id===p.id)?" selected":""}>${p.name}</option>`).join("")}
+  </select>
+</div>
+${pt?`
+<div class="alert-b alert" style="margin-bottom:14px">
+  Bệnh nhân: <strong>${pt.name}</strong> · ${pt.labs.filter(l=>l.status==="valid").length} kết quả còn hạn · ${pt.labs.filter(l=>l.status==="expired").length} đã hết hạn
+</div>
+<div class="card" style="margin-bottom:14px">
+  <table class="data-table">
+    <thead><tr><th>Xét nghiệm</th><th>LOINC</th><th>Kết quả</th><th>BV thực hiện</th><th>Ngày</th><th>Hiệu lực</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+    <tbody>
+    ${pt.labs.map(l=>`<tr>
+      <td><strong style="font-size:12px">${l.name}</strong></td>
+      <td><code style="font-size:10px;background:var(--blueL);color:var(--blueM);padding:1px 5px;border-radius:4px">${l.loinc}</code></td>
+      <td style="font-size:11px;font-weight:600;color:${l.status==="valid"?"var(--g1)":"var(--g5)"}">${l.result}</td>
+      <td>${bdg(getBV(l.bv).short,"#1A4A8A")}</td>
+      <td style="font-size:11px">${l.date}</td>
+      <td style="font-size:11px">${l.validity} ${l.unit}</td>
+      <td>${validTag(l.status)}</td>
+      <td><button class="btn-s" onclick="showLabDetail('${l.id}','${pt.id}')">FHIR</button></td>
+    </tr>`).join("")}
+    </tbody>
+  </table>
+</div>
+<!-- FHIR Observation preview -->
+<div class="card">
+  <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">HL7 FHIR R4 — Observation Resource (mẫu)</div>
+  <pre>${JSON.stringify({
+    resourceType:"Bundle",type:"searchset",total:pt.labs.length,
+    entry:[{resource:{
+      resourceType:"Observation",id:pt.labs[0].id,status:"final",
+      code:{coding:[{system:"http://loinc.org",code:pt.labs[0].loinc,display:pt.labs[0].name}]},
+      subject:{reference:"Patient/"+pt.id},
+      effectiveDateTime:pt.labs[0].date+"T08:30:00+07:00",
+      valueString:pt.labs[0].result,
+      performer:[{display:getBV(pt.labs[0].bv).name}],
+      extension:[{url:"https://healthv.vn/fhir/ext/validity-days",valueInteger:pt.labs[0].validity},{url:"https://healthv.vn/fhir/ext/reuse-status",valueString:pt.labs[0].status}]
+    }}]
+  },null,2)}</pre>
+</div>`:""} </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// PACS
+// ══════════════════════════════════════════════════════════
+function renderPACS(){
+  const pt=S.selectedPt?getPt(S.selectedPt):PATIENTS[0];
+  const modalityColors={"CR":"#7C3AED","CT":"#DC2626","US":"#059669","ECG":"#D97706","MRI":"#0EA5E9"};
+  return `<div class="fadein">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+  <div>
+    <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">🩻 PACS — Chẩn đoán Hình ảnh</h2>
+    <p style="font-size:12px;color:var(--g5)">DICOM 3.0 · WADO-RS · FHIR ImagingStudy · Smart Reuse cho ảnh chẩn đoán</p>
+  </div>
+  <select onchange="selectPACSPt(this.value)" style="width:220px">
+    ${PATIENTS.map(p=>`<option value="${p.id}"${(pt&&pt.id===p.id)?" selected":""}>${p.name}</option>`).join("")}
+  </select>
+</div>
+${pt?`
+<div class="g2" style="margin-bottom:14px">
+  <div class="stat"><div class="stat-lbl">IMAGING STUDIES</div><div class="stat-val" style="color:var(--purpM)">${pt.imaging.length}</div><div class="stat-sub">từ ${new Set(pt.imaging.map(i=>i.bv)).size} BV</div></div>
+  <div class="stat"><div class="stat-lbl">CÒN GIÁ TRỊ</div><div class="stat-val" style="color:var(--greenM)">${pt.imaging.filter(i=>i.status==="valid").length}</div><div class="stat-sub">không cần chụp lại</div></div>
+</div>
+<div style="display:grid;gap:12px">
+${pt.imaging.map(img=>{
+  const col=modalityColors[img.modality]||"#475569";
+  const bv=getBV(img.bv);
+  const remain=daysLeft(img.validity,img.daysAgo);
+  return `
+  <div class="card" style="border-left:4px solid ${col}">
+    <div style="display:flex;gap:14px;align-items:flex-start">
+      <!-- Modality icon -->
+      <div style="width:64px;height:64px;border-radius:10px;background:${col}18;border:1.5px solid ${col}40;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="font-size:18px">🩻</div>
+        <div style="font-size:9px;font-weight:800;color:${col}">${img.modality}</div>
+      </div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-size:13px;font-weight:700">${img.name}</div>
+          ${img.status==="valid"?`<span class="tag-g">✓ Còn ${remain} ngày</span>`:`<span class="tag-r">✗ Hết hạn</span>`}
+        </div>
+        <div style="display:flex;gap:10px;font-size:11px;color:var(--g5);margin-bottom:6px">
+          <span>📅 ${img.date}</span>
+          <span>${bdg(bv.short,"#1A4A8A")}</span>
+          <span>💾 ${img.size}</span>
+          <span>Hiệu lực: ${img.validity} ${img.unit}</span>
+        </div>
+        <div style="font-size:11px;color:var(--g1);background:var(--bg);padding:8px 10px;border-radius:7px;line-height:1.5;font-style:italic">"${img.finding}"</div>
+        ${img.status==="valid"?`
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button class="btn-s" onclick="showDICOMPreview('${img.id}','${pt.id}')">📋 DICOM Metadata</button>
+          <button class="btn-s" style="background:var(--purpL);border-color:var(--purpM);color:var(--purpM)" onclick="alert('Demo: Mở ảnh DICOM từ PACS ${bv.name} qua WADO-RS')">🩻 Xem ảnh (WADO-RS)</button>
+        </div>`:`
+        <div class="alert-y alert" style="margin-top:8px;padding:6px 10px">⏰ Kết quả đã hết hạn ${Math.abs(remain)} ngày. Xem xét chụp lại.</div>`}
+      </div>
+    </div>
+  </div>`;
+}).join("")}
+</div>`:""} </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// PATIENT PORTAL
+// ══════════════════════════════════════════════════════════
+function renderPortal(){
+  const pt=PATIENTS[0];
+  return `<div class="fadein">
+<div style="margin-bottom:18px">
+  <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">🏠 Patient Portal — Hồ sơ Cá nhân</h2>
+  <p style="font-size:12px;color:var(--g5)">Bệnh nhân tự xem hồ sơ · Quản lý consent · Audit log cá nhân · SMART on FHIR</p>
+</div>
+<!-- Login sim -->
+<div class="card" style="background:var(--navyL);border-color:var(--navyM);margin-bottom:16px">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">🔐 Đăng nhập bằng CCCD + eKYC (Demo)</div>
+  <div class="g3" style="margin-bottom:10px">
+    <div><label>Số CCCD</label><input type="text" value="001065012345" readonly style="background:#F0F4F8"></div>
+    <div><label>Xác thực khuôn mặt</label><div style="padding:9px 12px;border:1.5px solid var(--greenM);border-radius:8px;background:var(--greenL);font-size:12px;color:var(--greenM);font-weight:600">✅ Đã xác thực (demo)</div></div>
+    <div><label>OTP SMS</label><input type="text" value="••••••" readonly style="background:#F0F4F8"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--greenL);border-radius:8px;border:1px solid var(--greenM)">
+    <span style="color:var(--greenM);font-size:14px">✅</span>
+    <span style="font-size:12px;color:var(--green);font-weight:600">Đã đăng nhập: ${pt.name} · SIB ID: ${pt.id}</span>
+  </div>
+</div>
+<div class="g2">
+<div>
+  <!-- Summary -->
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Tổng quan hồ sơ của tôi</div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="stat"><div class="stat-lbl">LƯỢT KHÁM</div><div class="stat-val" style="color:var(--navy);font-size:22px">${pt.visits.length}</div><div class="stat-sub">tại ${new Set(pt.visits.map(v=>v.bv)).size} bệnh viện</div></div>
+      <div class="stat"><div class="stat-lbl">KẾT QUẢ XN</div><div class="stat-val" style="color:var(--blueM);font-size:22px">${pt.labs.length}</div><div class="stat-sub">${pt.labs.filter(l=>l.status==="valid").length} còn hạn</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">Chẩn đoán đang theo dõi</div>
+    ${pt.conditions.map(c=>`<div style="font-size:11px;color:var(--g1);margin-bottom:4px;padding:4px 8px;background:var(--bg);border-radius:6px">• ${c}</div>`).join("")}
+    ${pt.allergies.length?`<div style="margin-top:8px;padding:8px 10px;background:var(--redL);border-radius:8px;font-size:11px;color:var(--redM);font-weight:600">⚠ Dị ứng: ${pt.allergies.join(", ")}</div>`:""}
+  </div>
+  <!-- Consent management -->
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">🔒 Quản lý Consent của tôi</div>
+    ${[
+      {tier:1,label:"Tier 1 — Điều trị",desc:"Bác sĩ tại BV khác xem hồ sơ để điều trị",active:true,can_change:false},
+      {tier:2,label:"Tier 2 — Cải thiện chất lượng",desc:"Dữ liệu ẩn danh cho cải thiện hệ thống y tế",active:true,can_change:true},
+      {tier:3,label:"Tier 3 — Nghiên cứu / AI Training",desc:"Federated Learning và nghiên cứu lâm sàng",active:false,can_change:true},
+    ].map(t=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--g8)">
+      <div style="width:40px;height:24px;border-radius:12px;background:${t.active?"var(--tealM)":"var(--g8)"};flex-shrink:0;position:relative;cursor:${t.can_change?"pointer":"not-allowed"}" onclick="${t.can_change?"toggleConsent("+t.tier+")":""}">
+        <div style="width:18px;height:18px;border-radius:50%;background:white;position:absolute;top:3px;${t.active?"right:3px":"left:3px"};transition:all .2s"></div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600">${t.label}</div>
+        <div style="font-size:10px;color:var(--g5)">${t.desc}</div>
+      </div>
+      ${t.active?'<span class="tag-g">Bật</span>':'<span style="font-size:10px;color:var(--g5)">Tắt</span>'}
+    </div>`).join("")}
+    <p style="font-size:10px;color:var(--g5);margin-top:8px">* Tier 1 bắt buộc theo Luật KCB 2023. Có thể thay đổi Tier 2&3 bất cứ lúc nào.</p>
+  </div>
+</div>
+<div>
+  <!-- Recent results -->
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Kết quả xét nghiệm gần nhất</div>
+    ${pt.labs.slice(0,4).map(l=>`
+    <div style="padding:8px 0;border-bottom:1px solid var(--g8)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <span style="font-size:12px;font-weight:600">${l.name}</span>
+        ${validTag(l.status)}
+      </div>
+      <div style="font-size:11px;color:var(--g3)">${l.result} · ${l.date} · ${getBV(l.bv).short}</div>
+    </div>`).join("")}
+    <button class="btn-s" style="width:100%;margin-top:10px" onclick="switchTab('lis')">Xem tất cả kết quả →</button>
+  </div>
+  <!-- Audit log -->
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">📋 Ai đã xem hồ sơ của tôi</div>
+    ${[
+      {who:"BS. Lê Thị Hoa",bv:"Vinmec Times City",when:"18/01/2024 09:24",purpose:"Khám tái khám nội tiết",ok:true},
+      {who:"BS. Trần Minh Hùng",bv:"BV Bạch Mai",when:"03/01/2024 08:45",purpose:"Khám định kỳ",ok:true},
+      {who:"Hệ thống SIB",bv:"HealthV",when:"03/01/2024 08:45",purpose:"Sync dữ liệu tự động",ok:true},
+    ].map(a=>`
+    <div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--g8);align-items:center">
+      <span style="font-size:14px">${a.ok?"✅":"⚠️"}</span>
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:600">${a.who} · ${a.bv}</div>
+        <div style="font-size:10px;color:var(--g5)">${a.when} · ${a.purpose}</div>
+      </div>
+    </div>`).join("")}
+    <p style="font-size:10px;color:var(--g5);margin-top:8px">Mọi truy cập đều được ghi log theo NĐ 13/2023</p>
+  </div>
+</div>
+</div>
+</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// SECURITY
+// ══════════════════════════════════════════════════════════
+function renderSecurity(){
+  return `<div class="fadein">
+<div style="margin-bottom:18px">
+  <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">🔒 Bảo mật 2 Chiều — BV ↔ SIB ↔ Người bệnh</h2>
+  <p style="font-size:12px;color:var(--g5)">Zero-trust architecture · mTLS · RBAC · WORM Audit · Luật Dữ liệu 32/2024 · NĐ 13/2023</p>
+</div>
+<div class="g2" style="margin-bottom:14px">
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">🏥 Bảo mật phía BV (data provider)</div>
+  ${[
+    ["Adapter Read-Only","SELECT only trên DB HIS/LIS/PACS. Không INSERT/UPDATE/DELETE.","var(--greenM)","✅"],
+    ["Mutual TLS (mTLS)","Certificate riêng mỗi BV. Rotation 90 ngày. Man-in-middle không được.","var(--greenM)","✅"],
+    ["Data Sovereignty","Raw data KHÔNG rời BV. SIB chỉ lưu FHIR metadata + reference.","var(--greenM)","✅"],
+    ["DPA per BV","Mỗi BV ký Data Processing Agreement riêng. Purpose limitation rõ ràng.","var(--greenM)","✅"],
+    ["BV Audit Log","BV xem log real-time: ai query data của mình, khi nào, từ đâu.","var(--tealM)","✅"],
+    ["Right to withdraw","BV rút khỏi SIB bất cứ lúc nào. Data gốc tại BV không bị ảnh hưởng.","var(--tealM)","✅"],
+  ].map(([t,d,c,ic])=>`
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <span style="font-size:14px;flex-shrink:0">${ic}</span>
+    <div><div style="font-size:12px;font-weight:700;color:${c}">${t}</div><div style="font-size:11px;color:var(--g3)">${d}</div></div>
+  </div>`).join("")}
+</div>
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">👤 Bảo mật phía người bệnh</div>
+  ${[
+    ["3-Tier Consent","Tier 1 điều trị / Tier 2 cải thiện / Tier 3 nghiên cứu. Revoke bất cứ lúc nào.","var(--greenM)","✅"],
+    ["eKYC + MFA","CCCD + face biometric + OTP SMS. Không thể giả mạo danh tính.","var(--greenM)","✅"],
+    ["Sensitive data shield","HIV, tâm thần, sinh sản: ẩn khỏi SIB mặc định. Phải có explicit consent riêng.","var(--redM)","🛡️"],
+    ["Personal audit log","BN xem ai đã xem hồ sơ, khi nào, mục đích gì.","var(--tealM)","✅"],
+    ["Right to erasure","Xóa khỏi SIB layer. BV gốc giữ bản gốc theo quy định 10–15 năm.","var(--tealM)","✅"],
+    ["Data portability","Export hồ sơ FHIR R4 JSON hoặc PDF bất cứ lúc nào.","var(--purpM)","✅"],
+  ].map(([t,d,c,ic])=>`
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <span style="font-size:14px;flex-shrink:0">${ic}</span>
+    <div><div style="font-size:12px;font-weight:700;color:${c}">${t}</div><div style="font-size:11px;color:var(--g3)">${d}</div></div>
+  </div>`).join("")}
+</div>
+</div>
+<!-- RBAC table -->
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Phân quyền theo vai trò (RBAC)</div>
+  <table class="data-table">
+    <thead><tr><th>Vai trò</th><th>Xem hồ sơ BN</th><th>XN kết quả</th><th>Ảnh PACS</th><th>Dữ liệu ẩn danh</th><th>Cấu hình BV</th><th>Data clinical</th></tr></thead>
+    <tbody>
+    ${[
+      ["👨‍⚕️ Bác sĩ điều trị","✅ BN đang điều trị","✅","✅","✗","✗","✗"],
+      ["🚨 Bác sĩ cấp cứu","✅ Break-glass (alert)","✅","✅","✗","✗","✗"],
+      ["👩‍⚕️ Điều dưỡng","✅ Giới hạn scope","✅","✗","✗","✗","✗"],
+      ["📊 Quản lý BV","✗ Aggregate only","✗","✗","✅ DQ reports","✅","✗"],
+      ["🔬 Nghiên cứu viên","✗ IRB required","✗","✗","✅ Tier 2/3","✗","✗"],
+      ["👤 Bệnh nhân","✅ Hồ sơ của mình","✅ Của mình","✅ Của mình","✗","✗","✗"],
+      ["⚙️ SIB Admin (HealthV)","✗ NO ACCESS","✗","✗","✅ Metrics only","✅ Infra only","✗"],
+    ].map(r=>`<tr>${r.map((c,i)=>`<td style="font-size:11px${i===0?";font-weight:600":""}">${c}</td>`).join("")}</tr>`).join("")}
+    </tbody>
+  </table>
+</div>
+<!-- Compliance -->
+<div class="g3" style="margin-top:14px">
+  ${[
+    {law:"Luật Dữ liệu 32/2024",status:"✅",note:"Data lưu tại VN (VNG Cloud). Model weights không xuất khẩu."},
+    {law:"NĐ 13/2023",status:"✅",note:"WORM audit trail, consent rõ ràng, right to erasure."},
+    {law:"Luật KCB 2023 Điều 59",status:"✅",note:"SIB là giải pháp kỹ thuật trực tiếp cho yêu cầu liên thông."},
+    {law:"Luật AI 134/2025",status:"✅",note:"Risk assessment output, audit trail cho mọi AI decision."},
+    {law:"HL7 FHIR R4",status:"✅",note:"Toàn bộ output theo chuẩn FHIR R4 international."},
+    {law:"ISO 27001",status:"🔄",note:"Đang chuẩn bị certification trong lộ trình G1."},
+  ].map(c=>`
+  <div class="card-sm">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:11px;font-weight:700;color:var(--navy)">${c.law}</span>
+      <span style="font-size:14px">${c.status}</span>
+    </div>
+    <p style="font-size:10px;color:var(--g3)">${c.note}</p>
+  </div>`).join("")}
+</div>
+</div>`;
+}
+
+
+// ══════════════════════════════════════════════════════════
+// RBAC & ROLES
+// ══════════════════════════════════════════════════════════
+
+const ROLES_CONFIG = {
+  patient: {
+    id:"patient", label:"👤 Người bệnh", color:"#7C3AED", bg:"#F5F3FF",
+    desc:"Bệnh nhân đăng nhập qua CCCD + eKYC xem hồ sơ của chính mình",
+    auth:"CCCD + Face biometric + OTP SMS",
+    scope:"Hồ sơ cá nhân only",
+    permissions:{
+      his_read_own: true, lis_read_own: true, pacs_read_own: true,
+      his_read_other: false, lis_read_other: false, pacs_read_other: false,
+      write_any: false, admin_bv: false, admin_sib: false,
+      aggregate_data: false, research_data: false, billing_data: false,
+      audit_own: true, audit_all: false, consent_manage: true,
+      ai_products: false, export_own: true, mpi_lookup: false,
+    },
+    demo_user:{name:"Nguyễn Văn An",id:"SIB-2024-001",bv:"",cccd:"001065012345"}
+  },
+  doctor_own: {
+    id:"doctor_own", label:"👨‍⚕️ Bác sĩ tại BV A (BV gốc)", color:"#059669", bg:"#D1FAE5",
+    desc:"Bác sĩ thuộc BV A — có quyền đầy đủ trên BN của BV mình",
+    auth:"Mã hành nghề BYT + BV credential + MFA",
+    scope:"BN tại BV A (đã assign) + Smart Reuse query từ BV khác",
+    permissions:{
+      his_read_own: true, lis_read_own: true, pacs_read_own: true,
+      his_read_other: true, lis_read_other: true, pacs_read_other: true,
+      write_any: true, admin_bv: false, admin_sib: false,
+      aggregate_data: false, research_data: false, billing_data: false,
+      audit_own: false, audit_all: false, consent_manage: false,
+      ai_products: true, export_own: false, mpi_lookup: true,
+      smart_reuse: true, prescribe: true, order_lab: true, order_imaging: true,
+    },
+    demo_user:{name:"BS. Trần Minh Hùng",id:"BS-BM-001",bv:"bv_a",cccd:""}
+  },
+  doctor_other: {
+    id:"doctor_other", label:"👨‍⚕️ Bác sĩ tại BV B (đang tiếp nhận)", color:"#0EA5E9", bg:"#EFF6FF",
+    desc:"Bác sĩ BV B tiếp nhận BN chuyển viện — tra cứu Smart Reuse từ BV A",
+    auth:"Mã hành nghề BYT + BV B credential + MFA",
+    scope:"Chỉ xem qua Smart Reuse (Tier 1 consent). Không xem full hồ sơ khi không có consent.",
+    permissions:{
+      his_read_own: true, lis_read_own: true, pacs_read_own: true,
+      his_read_other: "consent_only", lis_read_other: "consent_only", pacs_read_other: "consent_only",
+      write_any: true, admin_bv: false, admin_sib: false,
+      aggregate_data: false, research_data: false, billing_data: false,
+      audit_own: false, audit_all: false, consent_manage: false,
+      ai_products: true, export_own: false, mpi_lookup: true,
+      smart_reuse: true, prescribe: true, order_lab: true, order_imaging: true,
+      can_see_bva_data: "via_smart_reuse_only",
+    },
+    demo_user:{name:"BS. Lê Thị Hoa",id:"BS-VM-002",bv:"bv_b",cccd:""}
+  },
+  emergency_doc: {
+    id:"emergency_doc", label:"🚨 Bác sĩ cấp cứu (Break-glass)", color:"#DC2626", bg:"#FEE2E2",
+    desc:"Cấp cứu — quyền xem khẩn cấp, audit ngay lập tức, alert tự động",
+    auth:"Emergency token + Dual authorization (BS + trưởng khoa)",
+    scope:"Full record access — nhưng mọi action đều được alert và audit real-time",
+    permissions:{
+      his_read_own: true, lis_read_own: true, pacs_read_own: true,
+      his_read_other: "break_glass", lis_read_other: "break_glass", pacs_read_other: "break_glass",
+      write_any: true, admin_bv: false, admin_sib: false,
+      aggregate_data: false, research_data: false, billing_data: false,
+      audit_own: false, audit_all: false, consent_manage: false,
+      ai_products: true, export_own: false, mpi_lookup: true,
+      break_glass: true, alert_sent: true, auto_expire_24h: true,
+    },
+    demo_user:{name:"BS. Vũ Minh Tuấn",id:"BS-ER-003",bv:"bv_d",cccd:""}
+  },
+  nurse: {
+    id:"nurse", label:"👩‍⚕️ Điều dưỡng", color:"#D97706", bg:"#FEF3C7",
+    desc:"Điều dưỡng — nhập vital signs, xem kết quả XN, không xem chẩn đoán nhạy cảm",
+    auth:"BV credential + MFA",
+    scope:"BN đang chăm sóc (assigned). Giới hạn category data",
+    permissions:{
+      his_read_own: "limited", lis_read_own: true, pacs_read_own: false,
+      his_read_other: false, lis_read_other: false, pacs_read_other: false,
+      write_any: "vitals_only", admin_bv: false, admin_sib: false,
+      aggregate_data: false, research_data: false, billing_data: false,
+      audit_own: false, audit_all: false, consent_manage: false,
+      ai_products: false, export_own: false, mpi_lookup: false,
+      no_sensitive: true, vitals_input: true,
+    },
+    demo_user:{name:"ĐD. Nguyễn Thị Thu",id:"NU-BM-001",bv:"bv_a",cccd:""}
+  },
+  bv_manager: {
+    id:"bv_manager", label:"📊 Quản lý BV", color:"#1A4A8A", bg:"#EEF2FB",
+    desc:"Ban giám đốc, phòng CNTT BV — quản lý kết nối SIB, DQ report, không xem hồ sơ BN",
+    auth:"BV Admin credential + Hardware key",
+    scope:"Dashboard BV: DQ score, connection status, aggregate stats, billing. Không có clinical data.",
+    permissions:{
+      his_read_own: false, lis_read_own: false, pacs_read_own: false,
+      his_read_other: false, lis_read_other: false, pacs_read_other: false,
+      write_any: false, admin_bv: true, admin_sib: false,
+      aggregate_data: true, research_data: false, billing_data: true,
+      audit_own: false, audit_all: "bv_scope", consent_manage: false,
+      ai_products: false, export_own: false, mpi_lookup: false,
+      dq_dashboard: true, bv_settings: true, adapter_config: true,
+    },
+    demo_user:{name:"TS. Nguyễn Bá Hoàng",id:"MGR-BM-001",bv:"bv_a",cccd:""}
+  },
+  researcher: {
+    id:"researcher", label:"🔬 Nghiên cứu viên", color:"#7C3AED", bg:"#F5F3FF",
+    desc:"Nhà nghiên cứu, trường y — chỉ được Federated Query aggregate, không xem cá nhân",
+    auth:"Institution credential + IRB token + SIB Research Account",
+    scope:"Federated Query chỉ với data Tier 2/3 consent. Kết quả aggregate, de-identified.",
+    permissions:{
+      his_read_own: false, lis_read_own: false, pacs_read_own: false,
+      his_read_other: false, lis_read_other: false, pacs_read_other: false,
+      write_any: false, admin_bv: false, admin_sib: false,
+      aggregate_data: "tier2_3_only", research_data: true, billing_data: false,
+      audit_own: false, audit_all: false, consent_manage: false,
+      ai_products: false, export_own: false, mpi_lookup: false,
+      federated_query: true, irb_required: true, no_raw_data: true,
+    },
+    demo_user:{name:"GS. Phạm Thị Lan",id:"RES-YHN-001",bv:"",cccd:""}
+  },
+  sib_admin: {
+    id:"sib_admin", label:"⚙️ SIB Admin (HealthV)", color:"#475569", bg:"#F1F5F9",
+    desc:"Nhà cung cấp giải pháp HealthV — quản lý hạ tầng SIB, tuyệt đối không xem clinical data",
+    auth:"Hardware key + Dual authorization (2 admin) + Zero-knowledge infra access",
+    scope:"Infra monitoring: uptime, performance, DQ metrics, billing. KHÔNG BAO GIỜ thấy patient data.",
+    permissions:{
+      his_read_own: false, lis_read_own: false, pacs_read_own: false,
+      his_read_other: false, lis_read_other: false, pacs_read_other: false,
+      write_any: false, admin_bv: false, admin_sib: true,
+      aggregate_data: "system_metrics_only", research_data: false, billing_data: "platform_billing",
+      audit_own: false, audit_all: "system_audit_only", consent_manage: false,
+      ai_products: false, export_own: false, mpi_lookup: false,
+      infra_monitor: true, no_clinical_data: true, segregated_access: true,
+    },
+    demo_user:{name:"Kỹ sư Trần Đức Anh",id:"SIB-ADM-001",bv:"",cccd:""}
+  },
+  pharmacist: {
+    id:"pharmacist", label:"💊 Dược sĩ", color:"#EA580C", bg:"#FFF7ED",
+    desc:"Dược sĩ lâm sàng — kiểm tra tương tác thuốc, dị ứng, đơn từ BV khác",
+    auth:"Dược sĩ license + BV credential + MFA",
+    scope:"Danh sách thuốc, dị ứng, chống chỉ định. Không xem chẩn đoán chi tiết.",
+    permissions:{
+      his_read_own: "meds_only", lis_read_own: "relevant_labs", pacs_read_own: false,
+      his_read_other: "meds_allergies_only", lis_read_other: false, pacs_read_other: false,
+      write_any: "dispense_only", admin_bv: false, admin_sib: false,
+      aggregate_data: false, research_data: false, billing_data: false,
+      audit_own: false, audit_all: false, consent_manage: false,
+      ai_products: false, export_own: false, mpi_lookup: true,
+      drug_interaction_check: true, allergy_check: true, dispense: true,
+    },
+    demo_user:{name:"DS. Lê Hoàng Minh",id:"PH-BM-001",bv:"bv_a",cccd:""}
+  },
+};
+
+const PERM_LABELS = {
+  his_read_own:"Xem HIS BV mình", lis_read_own:"Xem LIS BV mình",
+  pacs_read_own:"Xem PACS BV mình", his_read_other:"Xem HIS BV khác",
+  lis_read_other:"Xem LIS BV khác", pacs_read_other:"Xem PACS BV khác",
+  write_any:"Ghi / cập nhật data", admin_bv:"Admin BV",
+  admin_sib:"Admin SIB platform", aggregate_data:"Dữ liệu tổng hợp",
+  research_data:"Dữ liệu nghiên cứu", billing_data:"Dữ liệu thanh toán",
+  audit_own:"Xem audit log bản thân", audit_all:"Xem toàn bộ audit log",
+  consent_manage:"Quản lý consent", ai_products:"Dùng AI products",
+  export_own:"Export hồ sơ cá nhân", mpi_lookup:"Tra cứu MPI",
+  smart_reuse:"Smart Reuse Engine", break_glass:"Break-glass emergency",
+  federated_query:"Federated Query", dq_dashboard:"DQ Dashboard BV",
+  drug_interaction_check:"Drug interaction check", infra_monitor:"Monitor hạ tầng",
+};
+
+function permIcon(val){
+  if(val===true) return '<span style="color:#059669;font-size:14px">✅</span>';
+  if(val===false) return '<span style="color:#DC2626;font-size:14px">✗</span>';
+  if(val==="consent_only") return '<span style="color:#D97706;font-size:13px" title="Chỉ khi có consent Tier 1">🔐</span>';
+  if(val==="break_glass") return '<span style="color:#DC2626;font-size:13px" title="Break-glass — audit ngay">🚨</span>';
+  if(val==="limited"||val==="vitals_only"||val==="meds_only"||val==="meds_allergies_only"||val==="relevant_labs"||val==="dispense_only") return '<span style="color:#D97706;font-size:13px" title="Giới hạn phạm vi">⚠</span>';
+  if(typeof val==="string") return '<span style="color:#7C3AED;font-size:13px" title="'+val+'">◈</span>';
+  return '<span style="color:#94A3B8">—</span>';
+}
+
+function renderRBAC(){
+  const S_RBAC = window.RBAC_STATE || {activeRole:"doctor_own", activeTab:"overview", simResult:null, simLoading:false};
+  window.RBAC_STATE = S_RBAC;
+  const role = ROLES_CONFIG[S_RBAC.activeRole];
+  return `<div class="fadein">
+<div style="margin-bottom:18px">
+  <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">👥 RBAC — Phân quyền theo vai trò</h2>
+  <p style="font-size:12px;color:var(--g5)">Role-Based Access Control · 9 vai trò · Zero-trust · Mỗi role có màn hình dashboard riêng</p>
+</div>
+
+<!-- Role selector -->
+<div class="card" style="margin-bottom:16px">
+  <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px">Chọn vai trò để xem quyền hạn và màn hình tương ứng:</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    ${Object.values(ROLES_CONFIG).map(r=>`
+    <button onclick="selectRole('${r.id}')" style="padding:7px 14px;border-radius:8px;border:2px solid ${S_RBAC.activeRole===r.id?r.color:r.color+'40'};background:${S_RBAC.activeRole===r.id?r.bg:'white'};color:${r.color};font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s">
+      ${r.label}
+    </button>`).join("")}
+  </div>
+</div>
+
+<!-- Role detail -->
+<div class="g2" style="margin-bottom:14px">
+
+<!-- Left: Role profile + permissions -->
+<div>
+  <div class="card" style="border-color:${role.color};border-width:2px;margin-bottom:14px">
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
+      <div style="width:52px;height:52px;border-radius:12px;background:${role.bg};border:2px solid ${role.color};display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">${role.label.split(" ")[0]}</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:800;color:${role.color}">${role.label}</div>
+        <div style="font-size:11px;color:var(--g3);margin-top:3px;line-height:1.5">${role.desc}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+          <span style="font-size:10px;background:${role.color}18;color:${role.color};padding:2px 8px;border-radius:12px;font-weight:600">🔑 ${role.auth}</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--g8);margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;color:var(--g5);margin-bottom:3px">PHẠM VI TRUY CẬP</div>
+      <div style="font-size:11px;color:var(--g1)">${role.scope}</div>
+    </div>
+    <!-- Demo user -->
+    <div style="padding:10px 12px;background:${role.bg};border-radius:8px;border:1px solid ${role.color}40;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;color:${role.color};margin-bottom:5px">👤 USER DEMO</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
+        <div><span style="color:var(--g5)">Tên:</span> <strong>${role.demo_user.name}</strong></div>
+        <div><span style="color:var(--g5)">ID:</span> <code style="font-size:10px;background:white;padding:1px 5px;border-radius:4px">${role.demo_user.id}</code></div>
+        ${role.demo_user.bv?`<div><span style="color:var(--g5)">BV:</span> ${getBV(role.demo_user.bv).name}</div>`:""}
+        ${role.demo_user.cccd?`<div><span style="color:var(--g5)">CCCD:</span> ${role.demo_user.cccd}</div>`:""}
+      </div>
+    </div>
+    <!-- Permissions grid -->
+    <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">Chi tiết quyền hạn</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+      ${Object.entries(PERM_LABELS).filter(([k])=>k in role.permissions).map(([k,label])=>`
+      <div style="display:flex;gap:6px;align-items:center;padding:5px 8px;background:var(--bg);border-radius:6px">
+        ${permIcon(role.permissions[k])}
+        <span style="font-size:10px;color:var(--g1)">${label}</span>
+      </div>`).join("")}
+    </div>
+  </div>
+</div>
+
+<!-- Right: Simulated dashboard for this role -->
+<div>
+  <div class="card" style="margin-bottom:14px;border-top:4px solid ${role.color}">
+    <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px">
+      📱 Dashboard mô phỏng — ${role.label}
+    </div>
+    ${renderRoleDashboard(role)}
+  </div>
+  <div class="card">
+    <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px">🔐 Luồng xác thực (Authentication Flow)</div>
+    ${renderAuthFlow(role)}
+  </div>
+</div>
+</div>
+
+<!-- Full comparison matrix -->
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px">Ma trận Phân quyền Đầy đủ — Tất cả vai trò</div>
+  <div style="overflow-x:auto">
+  <table class="data-table" style="min-width:900px">
+    <thead>
+      <tr>
+        <th style="min-width:160px">Quyền hạn</th>
+        ${Object.values(ROLES_CONFIG).map(r=>`<th style="min-width:90px;text-align:center;font-size:10px">${r.label.split(" ").slice(0,2).join(" ")}</th>`).join("")}
+      </tr>
+    </thead>
+    <tbody>
+    ${Object.entries(PERM_LABELS).map(([k,label])=>`
+    <tr>
+      <td style="font-size:11px;font-weight:500;color:var(--g1)">${label}</td>
+      ${Object.values(ROLES_CONFIG).map(r=>`<td style="text-align:center">${permIcon(r.permissions[k]!==undefined?r.permissions[k]:false)}</td>`).join("")}
+    </tr>`).join("")}
+    </tbody>
+  </table>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:16px;font-size:10px;color:var(--g5)">
+    <span>✅ = Có quyền đầy đủ</span>
+    <span>✗ = Không có quyền</span>
+    <span>🔐 = Chỉ khi có patient consent</span>
+    <span>🚨 = Break-glass (audit ngay)</span>
+    <span>⚠ = Giới hạn phạm vi</span>
+    <span>◈ = Điều kiện đặc biệt</span>
+  </div>
+</div>
+
+<!-- Audit trail demo -->
+<div class="card" style="margin-top:14px;background:var(--navy);border:none">
+  <div style="font-size:13px;font-weight:700;color:white;margin-bottom:12px">📋 WORM Audit Trail — Mọi truy cập đều được ghi log bất biến</div>
+  <div style="overflow-x:auto">
+  <table style="width:100%;font-size:11px;color:rgba(255,255,255,.85);border-collapse:collapse">
+    <thead><tr>
+      ${["Timestamp","User / Vai trò","Hành động","BN","BV nguồn","Status","IP"].map(h=>`<th style="text-align:left;padding:6px 10px;color:#A8EDEA;font-size:10px;border-bottom:1px solid rgba(255,255,255,.15)">${h}</th>`).join("")}
+    </tr></thead>
+    <tbody>
+    ${[
+      ["2024-01-20 09:24:11","BS. Lê Thị Hoa (BV B)","Smart Reuse Query","Nguyễn Văn An","BV Bạch Mai","✅ Allowed — Tier 1","10.20.1.45"],
+      ["2024-01-20 09:24:12","SIB Engine","Auto validate consent","Nguyễn Văn An","SIB Central","✅ Consent verified","internal"],
+      ["2024-01-20 09:25:03","BS. Lê Thị Hoa (BV B)","View LIS CBC result","Nguyễn Văn An","BV Bạch Mai","✅ Allowed","10.20.1.45"],
+      ["2024-01-20 10:15:44","BS. Vũ Minh Tuấn (ER)","Break-glass access","Phạm Thị Dung","BV Thu Cúc","🚨 Break-glass — Alert sent","10.30.2.12"],
+      ["2024-01-20 10:15:45","SIB Engine","Alert notification","Phạm Thị Dung","SIB","🚨 Notified: BN, BV gốc, Admin","internal"],
+      ["2024-01-20 11:02:33","Nghiên cứu viên GS. Lan","Federated Query","[Anonymous]","Multi-BV aggregate","✅ Tier 2 — de-identified","research.vmu.edu.vn"],
+      ["2024-01-20 14:30:19","SIB Admin Trần Đức Anh","Check uptime metrics","NONE","System metrics only","✅ No clinical data accessed","healthv-ops.vn"],
+      ["2024-01-20 15:44:02","Nguyễn Văn An (Patient)","View own lab results","Nguyễn Văn An","Own records","✅ Own data","patient-app"],
+    ].map(r=>`<tr>${r.map((c,i)=>`<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.08);${i===5?('color:'+( c.startsWith('✅')?"#34D399":c.startsWith('🚨')?"#FCA5A5":"#94A3B8")):''}">${c}</td>`).join("")}</tr>`).join("")}
+    </tbody>
+  </table>
+  </div>
+  <div style="margin-top:10px;font-size:10px;color:rgba(255,255,255,.5)">⚠ WORM (Write Once Read Many) — không thể xóa hoặc sửa. Tuân thủ NĐ 13/2023 & Luật AI 134/2025. Lưu trữ 10 năm.</div>
+</div>
+
+</div>`;
+}
+
+function renderRoleDashboard(role){
+  const screens = {
+    patient: `
+      <div style="background:var(--purpL);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--purpM);margin-bottom:6px">Hồ sơ của tôi — Nguyễn Văn An</div>
+        <div style="font-size:10px;color:var(--purp)">📋 3 lần khám · 6 XN có kết quả · 3 ảnh chụp · 2 BV</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <div style="background:var(--greenL);border-radius:8px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--greenM)">5</div><div style="font-size:9px;color:var(--greenM)">XN còn hạn</div></div>
+        <div style="background:var(--redL);border-radius:8px;padding:8px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--redM)">2</div><div style="font-size:9px;color:var(--redM)">Đã hết hạn</div></div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--navy);margin-bottom:5px">Consent của tôi</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <span style="font-size:9px;background:var(--greenL);color:var(--greenM);padding:2px 7px;border-radius:10px;font-weight:600">✓ Tier 1 Điều trị</span>
+        <span style="font-size:9px;background:var(--greenL);color:var(--greenM);padding:2px 7px;border-radius:10px;font-weight:600">✓ Tier 2 Cải thiện</span>
+        <span style="font-size:9px;background:var(--g8);color:var(--g5);padding:2px 7px;border-radius:10px">✗ Tier 3 Nghiên cứu</span>
+      </div>
+      <div style="margin-top:8px;padding:6px 10px;background:var(--redL);border-radius:7px;font-size:10px;color:var(--redM)">⚠ Ai đã xem hồ sơ: 3 lần trong 7 ngày → <u>xem chi tiết</u></div>`,
+
+    doctor_own: `
+      <div style="background:var(--greenL);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--greenM)">BV Bạch Mai — BS. Trần Minh Hùng</div>
+        <div style="font-size:10px;color:var(--green)">Chuyên khoa: Nội tiết · Phòng khám số 3</div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--navy);margin-bottom:5px">BN hôm nay (toàn quyền)</div>
+      ${PATIENTS.slice(0,2).map(p=>`<div style="padding:6px 8px;background:var(--bg);border-radius:6px;margin-bottom:4px;font-size:10px"><strong>${p.name}</strong> · ${p.conditions[0].split("(")[0].trim()} <span style="color:var(--greenM);font-weight:600">→ Xem đầy đủ</span></div>`).join("")}
+      <div style="margin-top:8px;padding:6px 10px;background:var(--blueL);border-radius:7px;font-size:10px;color:var(--blueM)">⚡ Smart Reuse: 2 BN hôm nay tiết kiệm 3.2M VND XN trùng lặp</div>`,
+
+    doctor_other: `
+      <div style="background:var(--blueL);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--blueM)">Vinmec TC — BS. Lê Thị Hoa</div>
+        <div style="font-size:10px;color:var(--blue)">Tiếp nhận BN từ BV khác qua Smart Reuse</div>
+      </div>
+      <div style="padding:8px 10px;background:var(--goldL);border-radius:8px;border:1px solid var(--goldM);margin-bottom:8px;font-size:10px">
+        <div style="font-weight:700;color:var(--goldM);margin-bottom:3px">⚡ BN Nguyễn Văn An — Smart Reuse từ BV Bạch Mai</div>
+        <div style="color:var(--gold)">✅ CBC, HbA1c, Lipid: còn hạn<br>✅ X-quang phổi: còn 13 ngày<br>❌ FPG, ECG: cần làm lại</div>
+      </div>
+      <div style="font-size:10px;color:var(--redM);padding:6px 8px;background:var(--redL);border-radius:7px">🔐 Chỉ xem qua Smart Reuse. Full hồ sơ cần consent mở rộng.</div>`,
+
+    emergency_doc: `
+      <div style="background:var(--redL);border-radius:10px;padding:10px;margin-bottom:8px;border:2px solid var(--redM)">
+        <div style="font-size:11px;font-weight:800;color:var(--redM)">🚨 BREAK-GLASS ACTIVE</div>
+        <div style="font-size:10px;color:var(--red)">BV Thu Cúc · Phòng cấp cứu · BS. Vũ Minh Tuấn</div>
+      </div>
+      <div style="padding:8px;background:var(--redL);border-radius:8px;margin-bottom:8px;font-size:10px">
+        <div style="font-weight:700;color:var(--redM);margin-bottom:3px">Phạm Thị Dung — Cấp cứu khó thở</div>
+        <div style="color:var(--red)">✅ Full access (24h) · Alert đã gửi BN + BV gốc</div>
+        <div style="margin-top:4px">Dị ứng: <strong style="color:var(--redM)">Aspirin — co thắt phế quản ⚠</strong></div>
+        <div>Thuốc đang dùng: Bisoprolol, Furosemide, Tiotropium</div>
+      </div>
+      <div style="font-size:10px;color:var(--g5)">⏰ Quyền tự động hết sau 24h · Mọi action đang được ghi log</div>`,
+
+    nurse: `
+      <div style="background:var(--goldL);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--goldM)">BV Bạch Mai — ĐD. Nguyễn Thị Thu</div>
+        <div style="font-size:10px;color:var(--gold)">Khoa Nội tiết · Phòng 302</div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--navy);margin-bottom:5px">Nhập vital signs (được phép)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px">
+        ${[["Huyết áp","125/80 mmHg"],["Nhịp tim","78 bpm"],["SpO2","97%"],["Nhiệt độ","36.7°C"]].map(([l,v])=>`<div style="padding:5px 8px;background:var(--bg);border-radius:6px;font-size:10px"><span style="color:var(--g5)">${l}</span><br><strong>${v}</strong></div>`).join("")}
+      </div>
+      <div style="font-size:10px;color:var(--redM);padding:5px 8px;background:var(--redL);border-radius:7px">🚫 Không xem: chẩn đoán nhạy cảm, ảnh PACS, hồ sơ BV khác</div>`,
+
+    bv_manager: `
+      <div style="background:var(--navyL);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--navy)">BV Bạch Mai — Dashboard Quản lý</div>
+        <div style="font-size:10px;color:var(--navyM)">TS. Nguyễn Bá Hoàng · Giám đốc CNTT</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+        ${[["DQ Score","68%","#D97706"],["Kết nối","Active","#059669"],["BN/ngày","31,000","#0B2D5E"]].map(([l,v,c])=>`<div style="text-align:center;padding:6px;background:${c}18;border-radius:7px"><div style="font-size:14px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:${c}">${l}</div></div>`).join("")}
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--navy);margin-bottom:4px">Adapter status</div>
+      ${[["HIS Adapter","HL7v2","Online"],["LIS Adapter","ORU","Online"],["PACS","DICOM","Online"]].map(([n,t,s])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10px;border-bottom:1px solid #F1F5F9"><span>${n} (${t})</span><span style="color:#059669">● ${s}</span></div>`).join("")}
+      <div style="margin-top:8px;font-size:10px;color:var(--redM);padding:5px 8px;background:var(--redL);border-radius:7px">🚫 Không xem hồ sơ bệnh nhân cá nhân</div>`,
+
+    researcher: `
+      <div style="background:var(--purpL);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--purpM)">Nghiên cứu lâm sàng</div>
+        <div style="font-size:10px;color:var(--purp)">GS. Phạm Thị Lan · ĐH Y Hà Nội · IRB-2024-055</div>
+      </div>
+      <div style="padding:8px 10px;background:var(--bg);border-radius:8px;margin-bottom:8px;font-size:10px">
+        <div style="font-weight:700;margin-bottom:4px">Federated Query (de-identified)</div>
+        <code style="font-size:9px;display:block;background:#1E293B;color:#A8EDEA;padding:6px;border-radius:5px">SELECT COUNT(*), AVG(hba1c)<br>FROM patients<br>WHERE cond='E11' AND age>50<br>AGGREGATE ONLY · NO RAW DATA</code>
+      </div>
+      <div style="font-size:10px;color:var(--greenM);font-weight:600">Kết quả: 1,847 BN phù hợp · Avg HbA1c: 7.6%</div>
+      <div style="margin-top:6px;font-size:10px;color:var(--redM);padding:5px 8px;background:var(--redL);border-radius:7px">🚫 Không xem tên, CCCD, địa chỉ hay bất kỳ PHI nào</div>`,
+
+    sib_admin: `
+      <div style="background:#F1F5F9;border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--g1)">SIB Platform Monitor — HealthV</div>
+        <div style="font-size:10px;color:var(--g5)">Trần Đức Anh · System Engineer · No clinical data</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px">
+        ${[["Uptime","99.98%","#059669"],["API latency","42ms","#059669"],["Active BVs","5/5","#059669"],["Errors/hr","0","#059669"]].map(([l,v,c])=>`<div style="padding:6px 8px;background:${c}18;border-radius:7px;font-size:10px"><span style="color:var(--g5)">${l}</span><br><strong style="color:${c}">${v}</strong></div>`).join("")}
+      </div>
+      <div style="padding:8px;background:#1E293B;border-radius:8px;font-size:9px;color:#A8EDEA;font-family:monospace">System OK · VNG Cloud HCM · FHIR API v1.0 · 0 incidents</div>
+      <div style="margin-top:8px;padding:6px 10px;background:var(--redL);border-radius:7px;font-size:10px;color:var(--redM)">🛡️ Zero clinical data access — segregated infra access only</div>`,
+
+    pharmacist: `
+      <div style="background:var(--orangeL);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--orange)">BV Bạch Mai — Khoa Dược</div>
+        <div style="font-size:10px;color:var(--coral)">DS. Lê Hoàng Minh · Dược lâm sàng</div>
+      </div>
+      <div style="padding:8px;background:var(--redL);border-radius:8px;margin-bottom:6px;font-size:10px;border:1px solid var(--redM)">
+        <div style="font-weight:700;color:var(--redM);margin-bottom:3px">⚠ Drug Interaction Check — Phạm Thị Dung</div>
+        <div style="color:var(--red)">Furosemide + Aspirin → Giảm hiệu quả lợi tiểu<br>⚠ Dị ứng Aspirin đã được ghi nhận — KHÔNG CẤP</div>
+      </div>
+      <div style="font-size:10px;color:var(--greenM);font-weight:600;margin-bottom:4px">Đơn từ BV khác (Tier 1 consent)</div>
+      <div style="font-size:10px;color:var(--g3)">Tiotropium 18mcg — BV Bạch Mai (còn hạn)</div>
+      <div style="font-size:10px;color:var(--redM);margin-top:6px">🚫 Không xem: chẩn đoán, ảnh PACS, thông tin nhân khẩu học</div>`,
+  };
+  return screens[role.id] || `<p style="font-size:12px;color:var(--g5);text-align:center;padding:20px">Chọn vai trò để xem màn hình demo</p>`;
+}
+
+function renderAuthFlow(role){
+  const flows = {
+    patient:["Mở app SIB Patient Portal","Quét CCCD / nhập số CCCD","Xác thực khuôn mặt (eKYC)","Nhận OTP SMS 6 số","Đăng nhập — xem hồ sơ của mình"],
+    doctor_own:["Mở SIB Doctor Portal / HIS tích hợp","Nhập mã hành nghề BYT","Nhập BV credential (username)","Xác thực MFA (TOTP/SMS)","Đăng nhập — xem BN đang điều trị"],
+    doctor_other:["Mở SIB Doctor Portal tại BV B","Nhập mã hành nghề BYT + BV B credential","Xác thực MFA","Tra cứu BN qua CCCD/BHYT","Smart Reuse Engine kiểm tra consent → Hiển thị kết quả được phép"],
+    emergency_doc:["Kích hoạt Emergency Token","Nhập mã cấp cứu + thứ 2 xác nhận","Trưởng khoa cấp cứu dual-authorize","Break-glass access — 24h","Alert tự động: BN + BV gốc + SIB Admin"],
+    nurse:["Mở SIB Nurse App","Nhập BV credential","Xác thực MFA","Chọn BN đang chăm sóc","Quyền giới hạn: vital signs, XN kết quả"],
+    bv_manager:["Mở SIB Admin Portal","Nhập BV Admin credential","Xác thực Hardware key (YubiKey)","Đăng nhập — Dashboard quản lý","Không thấy bất kỳ patient data nào"],
+    researcher:["Nộp đơn Research Account + IRB","SIB verify IRB approval","Nhận Research credential + token","Đăng nhập Research Portal","Federated Query only — de-identified"],
+    sib_admin:["Đăng nhập Infra Portal (HealthV VPN)","Hardware key (YubiKey)","Dual authorization (2 admins required)","Access infra metrics + system logs","Zero clinical data — tách biệt hoàn toàn"],
+    pharmacist:["Mở SIB Pharmacy Module","Nhập dược sĩ license + BV credential","Xác thực MFA","Tra cứu BN (meds + allergy only)","Drug interaction check tự động"],
+  };
+  const steps=flows[role.id]||[];
+  return `<div style="display:flex;flex-direction:column;gap:5px">
+    ${steps.map((s,i)=>`<div style="display:flex;gap:8px;align-items:center">
+      <div style="width:22px;height:22px;border-radius:50%;background:${role.color};color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0">${i+1}</div>
+      <div style="font-size:11px;color:var(--g1);padding:5px 8px;background:var(--bg);border-radius:6px;flex:1">${s}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function selectRole(id){
+  if(!window.RBAC_STATE) window.RBAC_STATE={activeRole:"doctor_own"};
+  window.RBAC_STATE.activeRole=id;
+  renderPane("rbac");
+}
+
+
+// ══════════════════════════════════════════════════════════
+// ROI & INVESTOR
+// ══════════════════════════════════════════════════════════
+function renderROI(){
+  return `<div class="fadein">
+<div style="margin-bottom:18px">
+  <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:3px">💰 ROI & Mô hình Kinh doanh — For Investors</h2>
+  <p style="font-size:12px;color:var(--g5)">Working hypothesis — cần validate qua pilot. Không dùng trong investor deck chính thức trước khi có data pilot thực tế.</p>
+</div>
+
+<!-- ROI live calculator -->
+<div class="card" style="background:var(--navyL);border-color:var(--navyM);margin-bottom:16px">
+  <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px">📊 ROI Calculator — Ước tính tiết kiệm cho hệ thống</div>
+  <div class="g4" style="margin-bottom:14px">
+    <div><label>Số BV kết nối</label><input type="range" id="roi-bv" min="5" max="200" value="20" oninput="updateROI()"><div style="text-align:center;font-size:12px;font-weight:700;color:var(--navy)" id="roi-bv-val">20 BV</div></div>
+    <div><label>BN/ngày/BV (avg)</label><input type="range" id="roi-pts" min="50" max="500" value="200" oninput="updateROI()"><div style="text-align:center;font-size:12px;font-weight:700;color:var(--navy)" id="roi-pts-val">200 BN</div></div>
+    <div><label>% BN chuyển viện</label><input type="range" id="roi-pct" min="5" max="40" value="20" oninput="updateROI()"><div style="text-align:center;font-size:12px;font-weight:700;color:var(--navy)" id="roi-pct-val">20%</div></div>
+    <div><label>Chi phí XN avg</label><input type="range" id="roi-cost" min="500" max="3000" value="1500" step="100" oninput="updateROI()"><div style="text-align:center;font-size:12px;font-weight:700;color:var(--navy)" id="roi-cost-val">1.5M VND</div></div>
+  </div>
+  <div class="g3">
+    <div class="stat" style="background:white"><div class="stat-lbl">TIẾT KIỆM/NGÀY</div><div class="roi-num" id="roi-daily">0M</div><div class="stat-sub">VND</div></div>
+    <div class="stat" style="background:white"><div class="stat-lbl">TIẾT KIỆM/THÁNG</div><div class="roi-num" id="roi-monthly">0M</div><div class="stat-sub">VND</div></div>
+    <div class="stat" style="background:white"><div class="stat-lbl">TIẾT KIỆM/NĂM</div><div class="roi-num" id="roi-annual">0B</div><div class="stat-sub">VND</div></div>
+  </div>
+</div>
+
+<!-- Revenue model -->
+<div class="card" style="margin-bottom:14px">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Mô hình doanh thu đa nguồn</div>
+  <table class="data-table">
+    <thead><tr><th>Revenue Stream</th><th>Mô tả</th><th>Pricing</th><th>WTP ước tính</th><th>Timeline</th></tr></thead>
+    <tbody>
+    ${[
+      ["SIB Enterprise","BV tư hạng I — HIS+LIS+PACS đầy đủ","30–80M VND/tháng","HIGH","G0+"],
+      ["SIB Growth","BV tư hạng II–III","15–30M VND/tháng","HIGH","G1+"],
+      ["SIB Starter","Phòng khám tư","5–15M VND/tháng","MEDIUM","G1+"],
+      ["Implementation","Build Adapter mới","50–300M VND/lần","HIGH (immediate)","G0+"],
+      ["DQ as a Service","Báo cáo chất lượng data","10–30M VND/năm","MEDIUM","G1+"],
+      ["AI Bundle","EvalAIH + Ambient Scribe via Bridge","20–50M VND/tháng","MEDIUM","G2+"],
+      ["Research / Pharma","Federated Query de-identified","$50K–200K/study","HIGH (dài hạn)","G3+"],
+      ["BHYT Smart Reuse","Validation API tránh thanh toán trùng","Negotiated","STRATEGIC","G2+"],
+    ].map(r=>`<tr>${r.map((c,i)=>`<td style="font-size:11px${i===0?";font-weight:600":""}">${c}</td>`).join("")}</tr>`).join("")}
+    </tbody>
+  </table>
+</div>
+
+<!-- Phase roadmap -->
+<div class="g2" style="margin-bottom:14px">
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Lộ trình Revenue 2026–2030</div>
+  ${[
+    {ph:"G0",time:"Q1-Q2/2026",bv:"1 BV",rev:"0 (pilot free)",cost:"500M",net:"−500M",col:"#94A3B8"},
+    {ph:"G1",time:"Q3/2026–Q1/2027",bv:"5–10 BV",rev:"500M–1.5 tỷ",cost:"600M",net:"−100M đến +900M",col:"#D97706"},
+    {ph:"G2",time:"2027",bv:"20–30 BV",rev:"2–5 tỷ",cost:"1.2 tỷ",net:"+0.8–3.8 tỷ",col:"#059669"},
+    {ph:"G3",time:"2028–2029",bv:"50–100 BV",rev:"8–20 tỷ",cost:"3 tỷ",net:"+5–17 tỷ",col:"#0B2D5E"},
+    {ph:"G4",time:"2030+",bv:"100–200+ BV",rev:"20–40 tỷ",cost:"7 tỷ",net:"+13–33 tỷ",col:"#7C3AED"},
+  ].map(r=>`
+  <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--g8)">
+    <div style="width:34px;height:34px;border-radius:50%;background:${r.col};color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">${r.ph}</div>
+    <div style="flex:1">
+      <div style="font-size:11px;font-weight:700;color:${r.col}">${r.time} · ${r.bv}</div>
+      <div style="font-size:10px;color:var(--g5)">Doanh thu: ${r.rev} · Chi phí: ${r.cost} VND</div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:${r.net.startsWith("+")?"#059669":"#94A3B8"};text-align:right;min-width:110px">${r.net}</div>
+  </div>`).join("")}
+  <p style="font-size:10px;color:var(--g5);margin-top:8px">⚠ Working hypothesis — cần validate qua pilot thực tế</p>
+</div>
+<div class="card">
+  <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Investment Thesis cho Nhà đầu tư</div>
+  ${[
+    ["Market Timing","Luật KCB 2023 Điều 59 → BV buộc phải có liên thông. Window 2026–2027 là critical.","#D97706"],
+    ["Infrastructure Moat","Mỗi BV kết nối = switching cost cao. Network effect: N BV → value ∝ N².","#059669"],
+    ["First-mover","Không có competitor nào tại VN có HIS+LIS+PACS+Smart Reuse đầy đủ.","#7C3AED"],
+    ["Multiple Revenue","8+ revenue streams. Không phụ thuộc 1 nguồn. Cash flow từ sớm (implementation fees).","#059669"],
+    ["AI Flywheel","SIB data → EvalAIH/Ambient Scribe accuracy tốt hơn → more BV adopt → more data.","#0EA5E9"],
+    ["BYT Mandate Potential","Nếu pilot thành công, BYT có thể mandate adoption → 1.600+ BV, 25.000+ phòng khám.","#0B2D5E"],
+  ].map(([t,d,c])=>`
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <div style="width:10px;border-radius:2px;background:${c};flex-shrink:0"></div>
+    <div><div style="font-size:11px;font-weight:700;color:${c}">${t}</div><div style="font-size:10px;color:var(--g3)">${d}</div></div>
+  </div>`).join("")}
+</div>
+</div>
+
+<!-- Investment ask -->
+<div class="card" style="background:var(--navy);border:none">
+  <div style="font-size:15px;font-weight:800;color:white;margin-bottom:12px;text-align:center">Yêu cầu đầu tư & Sử dụng vốn</div>
+  <div class="g4">
+    ${[
+      {round:"Seed",amount:"1–2M USD",use:"70% Engineering G0+G1 · 15% BV partnerships · 10% Legal · 5% Ops",milestone:"5 BV live · Smart Reuse proven · First revenue",col:"#D97706"},
+      {round:"Series A",amount:"5–10M USD",use:"50% Engineering G2 · 25% Sales · 15% BYT regulatory · 10% Research",milestone:"20+ BV · 2 tỷ VND ARR · BYT recognition",col:"#059669"},
+      {round:"Series B",amount:"15–30M USD",use:"40% National scale · 30% ASEAN · 20% FL integration · 10% AI R&D",milestone:"50+ BV · National mandate · 10 tỷ VND ARR",col:"#0EA5E9"},
+      {round:"Growth",amount:"50M+ USD",use:"ASEAN expansion · M&A HIS vendors · AI Marketplace · IPO prep",milestone:"100+ BV · 3+ countries · Platform position",col:"#7C3AED"},
+    ].map(r=>`
+    <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px;border:1px solid ${r.col}40">
+      <div style="font-size:10px;color:${r.col};font-weight:700;margin-bottom:4px">${r.round}</div>
+      <div style="font-size:18px;font-weight:800;color:white;margin-bottom:8px">${r.amount}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.7);margin-bottom:6px">${r.use}</div>
+      <div style="font-size:10px;color:${r.col};font-weight:600">→ ${r.milestone}</div>
+    </div>`).join("")}
+  </div>
+</div>
+</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// ACTIONS & EVENTS
+// ══════════════════════════════════════════════════════════
+function attachEvents(id){
+  if(id==="reuse"){
+    if(S.reuseQuery.cccd){
+      const el=document.getElementById("reuse-cccd");
+      if(el) el.value=S.reuseQuery.cccd;
+    }
+  }
+}
+
+function selectPt(id){S.selectedPt=S.selectedPt===id?null:id;renderPane("patients");}
+function setReusePatient(id){const pt=getPt(id);if(pt){S.reuseQuery.cccd=pt.cccd;}renderPane("reuse");}
+function quickSelectPt(cccd){S.reuseQuery.cccd=cccd;const el=document.getElementById("reuse-cccd");if(el)el.value=cccd;}
+function selectLISPt(id){S.selectedPt=id;renderPane("lis");}
+function selectPACSPt(id){S.selectedPt=id;renderPane("pacs");}
+
+function runReuse(){
+  const cccdEl=document.getElementById("reuse-cccd");
+  const cccd=(cccdEl?cccdEl.value:"").trim();
+  if(!cccd){alert("Vui lòng nhập CCCD hoặc BHYT");return;}
+  const pt=PATIENTS.find(p=>p.cccd===cccd||p.bhyt===cccd||p.id===cccd);
+  if(!pt){alert("Không tìm thấy bệnh nhân. Thử: 001065012345 (Nguyễn Văn An)");return;}
+  S.reuseLoading=true;S.reuseResult=null;renderPane("reuse");
+  setTimeout(()=>{S.reuseLoading=false;S.reuseResult=pt;renderPane("reuse");},1500);
+}
+
+function updateROI(){
+  const bv=+document.getElementById("roi-bv").value;
+  const pts=+document.getElementById("roi-pts").value;
+  const pct=+document.getElementById("roi-pct").value;
+  const cost=+document.getElementById("roi-cost").value;
+  document.getElementById("roi-bv-val").textContent=bv+" BV";
+  document.getElementById("roi-pts-val").textContent=pts+" BN";
+  document.getElementById("roi-pct-val").textContent=pct+"%";
+  document.getElementById("roi-cost-val").textContent=(cost/1000).toFixed(0)+"K VND";
+  const daily=bv*pts*(pct/100)*cost*0.3; // 30% XN tránh được
+  const monthly=daily*22;
+  const annual=monthly*12;
+  document.getElementById("roi-daily").textContent=(daily/1000000).toFixed(1)+"M";
+  document.getElementById("roi-monthly").textContent=(monthly/1000000).toFixed(0)+"M";
+  document.getElementById("roi-annual").textContent=annual>=1000000000?(annual/1000000000).toFixed(1)+"B":(annual/1000000).toFixed(0)+"M";
+}
+
+function showConnectModal(){
+  let step=0;const steps=["Thông tin BV","Chọn Adapter","Kiểm tra kết nối","Hoàn tất"];
+  function renderM(){
+    const bodies={
+      0:`<div style="display:grid;gap:12px">
+          <div><label>Tên BV / Phòng khám</label><input type="text" id="m-name" placeholder="VD: BV Medlatec"></div>
+          <div><label>HIS Vendor</label><select id="m-vendor"><option>Medisoft</option><option>iSofH</option><option>VNPT-IT</option><option>Oracle Health</option><option>Phần mềm tự viết</option></select></div>
+         </div>`,
+      1:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${[["SQL","DB Connector","#7C3AED"],["HL7v2","MLLP Listener","#059669"],["FHIR","Native FHIR","#0EA5E9"],["REST","API Adapter","#D97706"],["CSV","File Watcher","#DC2626"]].map(([k,d,c])=>`
+          <div onclick="this.style.border='2px solid ${c}'" style="padding:10px;border:1.5px solid var(--g8);border-radius:8px;cursor:pointer">
+            <div style="font-size:11px;font-weight:700;color:${c}">${k}</div><div style="font-size:10px;color:var(--g5)">${d}</div>
+          </div>`).join("")}
+         </div>`,
+      2:`<div style="text-align:center;padding:20px">
+          <div style="width:40px;height:40px;border:4px solid var(--g8);border-top-color:var(--tealM);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px"></div>
+          <p style="font-size:13px;font-weight:600;color:var(--navy)">Kiểm tra kết nối...</p>
+          ${["✓ Ping OK","✓ Read-only access","✓ Schema detected","✓ LIS HL7 v2.5 found","✓ PACS DICOM found"].map(s=>`<p style="font-size:11px;color:var(--greenM);margin-top:4px">${s}</p>`).join("")}
+         </div>`,
+      3:`<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:12px">🎉</div><div style="font-size:16px;font-weight:800;color:var(--greenM)">Kết nối thành công!</div><p style="font-size:12px;color:var(--g3);margin-top:6px">BV đã được thêm vào SIB. Sync sẽ bắt đầu trong 15 phút.</p></div>`,
+    };
+    document.getElementById('modal-body').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div><div style="font-size:16px;font-weight:800;color:var(--navy)">Kết nối BV mới</div><div style="font-size:11px;color:var(--g5)">Không yêu cầu thay đổi HIS/LIS/PACS</div></div>
+      <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;font-size:22px;color:var(--g5);cursor:pointer">×</button>
+    </div>
+    <div style="display:flex;margin-bottom:18px">${steps.map((s,i)=>`<div style="flex:1;text-align:center"><div style="width:28px;height:28px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:${i<=step?"var(--tealM)":"var(--g8)"};color:${i<=step?"white":"var(--g5)"}">${i+1}</div><div style="font-size:9px;color:${i<=step?"var(--tealM)":"var(--g5)"}">${s}</div></div>`).join("")}</div>
+    ${bodies[step]||""}
+    <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end">
+      ${step>0&&step<3?`<button class="btn-s" onclick="window._step=${step-1};renderM()">← Quay lại</button>`:""}
+      ${step<3?`<button class="btn-p" onclick="${step===2?"window._step=3;renderM()":"window._step="+(step+1)+";renderM()"}">${step===2?"Xác nhận":"Tiếp tục →"}</button>`:""}
+      ${step===3?`<button class="btn-p" onclick="document.getElementById('modal').style.display='none'">Hoàn tất ✓</button>`:""}
+    </div>`;
+    if(step===2)setTimeout(()=>{step=3;renderM();},2200);
+  }
+  window._step=0;
+  Object.defineProperty(window,'_step',{set(v){step=v},get(){return step}});
+  window.renderM=renderM;
+  document.getElementById('modal').style.display='flex';
+  renderM();
+}
+
+function showDICOMPreview(imgId,ptId){
+  const pt=getPt(ptId);
+  const img=pt?pt.imaging.find(i=>i.id===imgId):null;
+  if(!img)return;
+  const bv=getBV(img.bv);
+  document.getElementById('modal-body').innerHTML=`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div><div style="font-size:15px;font-weight:700;color:var(--navy)">DICOM Metadata · FHIR ImagingStudy</div></div>
+    <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;font-size:22px;color:var(--g5);cursor:pointer">×</button>
+  </div>
+  <div style="display:flex;gap:5px;margin-bottom:8px">
+    ${bdg("200 OK","#059669")} ${bdg("GET /fhir/r4/ImagingStudy/"+img.id,"#0B2D5E")} ${bdg("DICOM 3.0","#7C3AED")}
+  </div>
+  <pre>${JSON.stringify({
+    resourceType:"ImagingStudy",id:img.id,status:"available",
+    subject:{reference:"Patient/"+ptId},
+    started:img.date+"T08:30:00+07:00",
+    location:{display:bv.name},
+    series:[{number:1,modality:{code:img.modality,system:"http://dicom.nema.org/resources/ontology/DCM"},
+      description:img.name,
+      endpoint:[{reference:"wado://"+bv.id+"/wado?studyUID="+img.id}]}],
+    extension:[
+      {url:"https://healthv.vn/fhir/ext/validity-days",valueInteger:img.validity},
+      {url:"https://healthv.vn/fhir/ext/reuse-status",valueString:img.status},
+      {url:"https://healthv.vn/fhir/ext/finding",valueString:img.finding},
+      {url:"https://healthv.vn/fhir/ext/file-size",valueString:img.size},
+    ]
+  },null,2)}</pre>
+  <button onclick="document.getElementById('modal').style.display='none'" class="btn-p" style="margin-top:10px;width:100%">Đóng</button>`;
+  document.getElementById('modal').style.display='flex';
+}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function init(){
+  // Hide app, show login
+  const app = document.getElementById('main-app');
+  if(app) app.style.display='none';
+  renderLoginScreen();
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</div><!-- end main-app -->
+</body>
+</html>
